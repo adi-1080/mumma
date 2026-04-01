@@ -1,5 +1,23 @@
 @import "tailwindcss";
 
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Add this block to force the pointer cursor on all buttons */
+@layer base {
+
+  button,
+  [role="button"] {
+    cursor: pointer;
+  }
+
+  /* Optional: Keep the default arrow if the button is disabled */
+  button:disabled {
+    cursor: default;
+  }
+}
+
 :root {
   --background: #ffffff;
   --foreground: #171717;
