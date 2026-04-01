@@ -2,7 +2,6 @@ import { neonConfig } from '@neondatabase/serverless';
 import { PrismaNeon } from '@prisma/adapter-neon';
 import { PrismaClient } from '@prisma/client';
 import ws from 'ws';
-import "dotenv/config";
 
 // Required for Neon to run over WebSockets in standard Node/Next.js routes
 neonConfig.webSocketConstructor = ws;
