@@ -14,9 +14,12 @@ model User {
   image         String?
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
-  recipes       Recipe[]
   accounts      Account[]
   sessions      Session[]
+
+  cookingSessions CookingSession[]
+  cookResults     CookResult[]
+  communityPosts  CommunityPost[]
 
   @@map("user")
 }
@@ -68,13 +71,95 @@ model Verification {
   @@map("verification")
 }
 
-model Recipe {
-  id           String   @id @default(cuid())
-  title        String
-  ingredients  String
-  instructions String
+// ── MummaCooks Models ──────────────────────────────────────────
+
+model CookingSession {
+  id          String        @id @default(cuid())
+  userId      String?
+  ingredients Json
+  recipeName  String
+  recipeDesc  String
+  totalSteps  Int
+  status      SessionStatus @default(IN_PROGRESS)
+  steps       CookingStep[]
+  result      CookResult?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([status])
+}
+
+enum SessionStatus {
+  IN_PROGRESS
+  COMPLETED
+}
+
+model CookingStep {
+  id          String   @id @default(cuid())
+  sessionId   String
+  stepNumber  Int
+  title       String
+  instruction String
+  isCompleted Boolean  @default(false)
+  chats       StepChat[]
+
+  session CookingSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  @@index([sessionId])
+  @@unique([sessionId, stepNumber])
+}
+
+model StepChat {
+  id        String   @id @default(cuid())
+  stepId    String
+  role      ChatRole
+  content   String   @db.Text
+  createdAt DateTime @default(now())
+
+  step CookingStep @relation(fields: [stepId], references: [id], onDelete: Cascade)
+
+  @@index([stepId])
+}
+
+enum ChatRole {
+  USER
+  MOM
+}
+
+model CookResult {
+  id           String    @id @default(cuid())
+  sessionId    String    @unique
   userId       String?
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-  user         User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  score        Int
+  foodPhotoUrl String?
+  selfieUrl    String?
+  isPublished  Boolean   @default(false)
+  publishedAt  DateTime?
+  recipeName   String
+  ingredients  Json
+  createdAt    DateTime  @default(now())
+
+  session       CookingSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  user          User?          @relation(fields: [userId], references: [id], onDelete: SetNull)
+  communityPost CommunityPost?
+
+  @@index([userId])
+  @@index([isPublished])
+}
+
+model CommunityPost {
+  id        String   @id @default(cuid())
+  resultId  String   @unique
+  userId    String?
+  caption   String?  @db.Text
+  createdAt DateTime @default(now())
+
+  result CookResult @relation(fields: [resultId], references: [id], onDelete: Cascade)
+  user   User?      @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([createdAt])
+  @@index([userId])
 }
