@@ -1,55 +1,104 @@
-"use client";
+import Link from 'next/link';
+import Button from '@/components/ui/Button';
+import Card from '@/components/ui/Card';
+import MomAnimation from '@/components/ui/MomAnimation';
+import Cheese2D from '@/components/ui/Cheese2D';
+import AppLogo from '@/components/ui/AppLogo';
 
-import { authClient } from "@/lib/auth-client";
-import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+const samplePosts = [
+  { name: "Dal Tadka", emoji: "🥘", score: 8, user: "Arjun M.", bg: "bg-blue" },
+  { name: "Aloo Paratha", emoji: "🫓", score: 10, user: "Sneha K.", bg: "bg-green" },
+  { name: "Maggi Masala", emoji: "🍜", score: 7, user: "Dev P.", bg: "bg-orange" },
+];
 
 export default function LandingPage() {
-  const router = useRouter();
-
-  const { data: session, isPending } = authClient.useSession();
-
-  useEffect(() => {
-    if (session) {
-      router.push("/dashboard")
-    }
-  }, [session, router]);
-
-  const handleGoogleSignIn = async () => {
-    await authClient.signIn.social({
-      provider: "google",
-      callbackURL: "/dashboard",
-    });
-  };
-
-  if (isPending) return <div className="flex h-screen items-center justify-center">Loading...</div>;
-  if (session) return null;
-
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50 text-gray-900 font-sans px-4">
-      <div className="max-w-3xl text-center space-y-8">
-        <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight text-gray-900">
-          Build Faster with <span className="text-blue-600">Next.js</span>
+    <div className="main-container fade-up container-mobile">
+      {/* Hero Section */}
+      <div className="bg-yellow border-[2.5px] border-dark rounded-[28px] p-6 mb-3 relative overflow-hidden shadow-custom card-mobile">
+        <span className="spin-slow absolute right-24 top-4 text-xl"><span className="emoji-sparkle"></span></span>
+        <div className="text-xs font-extrabold bg-dark text-yellow rounded-[20px] px-3.5 py-1.5 inline-flex items-center justify-center gap-1.5 mb-3.5 tracking-wider">
+          <div className="w-4 h-4 rounded-[4px] overflow-hidden bg-white"><AppLogo className="w-full h-full object-cover" /></div> <span className="text-aai">AAI</span> IS HERE TO HELP YOU COOK
+        </div>
+        <h1 className="font-lilita text-4xl text-dark mb-2.5 leading-tight tracking-tight heading-responsive">
+          Cook with<br />
+          <span className="text-pink">Mumma <span className="emoji-heart"></span></span>
         </h1>
-        <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-          The ultimate starter kit powered by Prisma, NeonDB, and Better Auth. Secure, serverless, and ready to scale.
+        <p className="text-sm font-bold text-dark/60 mb-5 text-responsive">
+          Step-by-step. Ask anything. Never get stuck.
         </p>
-
-        <div className="pt-4">
-          <button
-            onClick={handleGoogleSignIn}
-            className="flex items-center gap-3 bg-white border border-gray-300 rounded-full px-8 py-4 text-lg font-semibold hover:bg-gray-50 transition-all shadow-sm mx-auto"
-          >
-            <svg className="w-6 h-6" viewBox="0 0 24 24">
-              <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" />
-              <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853" />
-              <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05" />
-              <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335" />
-            </svg>
-            Continue with Google
-          </button>
+        <Link href="/cook" className="btn-primary btn-mobile inline-block w-fit">
+          Start Cooking →
+        </Link>
+        <div className="absolute -right-6 -bottom-8 rotate-12 z-0 opacity-90 scale-[0.7] transform-gpu">
+          <Cheese2D />
         </div>
       </div>
+
+      {/* Mom's Message */}
+      <div className="flex gap-3 mb-3 gap-responsive">
+        <div className="w-11 h-11 rounded-full border-[2.5px] border-dark flex items-center justify-center shadow-custom-small flex-shrink-0 overflow-hidden bg-white">
+          <AppLogo className="w-full h-full object-cover" />
+        </div>
+        <div className="bg-yellow border-[2.5px] border-dark rounded-[14px] rounded-tl-[4px] p-3.5 text-sm font-bold text-dark leading-relaxed flex-1 shadow-custom">
+          Hey beta! Mumma's here to help you cook <span className="emoji-cheese emoji-mobile"></span><br />
+          <span className="text-xs opacity-65">Tell me what you have — I'll figure out perfect dish!</span>
+        </div>
+      </div>
+
+      {/* Features Grid */}
+      <div className="grid grid-cols-2 gap-3 mb-3 grid-responsive">
+        <Card className="bg-blue card-mobile">
+          <div className="text-2xl mb-2"><span className="emoji-plate emoji-mobile"></span></div>
+          <h3 className="font-lilita text-xl text-dark mb-1 text-responsive">Step-by-step</h3>
+          <p className="text-xs font-bold text-dark/55">
+            Every dish as simple cards. No confusion ever.
+          </p>
+        </Card>
+        <Card className="bg-green card-mobile">
+          <div className="text-2xl mb-2">💬</div>
+          <h3 className="font-lilita text-xl text-dark mb-1 text-responsive">Ask Mumma</h3>
+          <p className="text-xs font-bold text-dark/55">
+            Got a doubt? Ask mumma at any step!
+          </p>
+        </Card>
+      </div>
+
+      {/* Score & Share */}
+      <Card className="bg-orange flex items-center gap-4 mb-4 card-mobile">
+        <div className="text-4xl"><span className="emoji-trophy emoji-mobile"></span></div>
+        <div>
+          <h3 className="font-lilita text-xl text-dark mb-1">Score & Share</h3>
+          <p className="text-xs font-bold text-dark/55">
+            Upload your dish, get a mumma score, share with the world!
+          </p>
+        </div>
+      </Card>
+
+      {/* Community Preview */}
+      <div className="mb-4">
+        <div className="text-xs font-extrabold text-dark/45 tracking-wider uppercase mb-2.5">
+          what others cooked <span className="emoji-sparkle"></span>
+        </div>
+        <div className="flex gap-2.5 overflow-x-auto pb-1">
+          {samplePosts.map((post, index) => (
+            <div key={index} className="flex-shrink-0 w-31 bg-white border-[2.5px] border-dark rounded-[18px] overflow-hidden shadow-custom">
+              <div className={`${post.bg} h-[62px] flex items-center justify-center text-[30px] border-b-2 border-dark`}
+                dangerouslySetInnerHTML={{ __html: post.emoji }}
+              />
+              <div className="p-2.5">
+                <div className="font-lilita text-xs text-dark mb-1.5">{post.name}</div>
+                <span className="bg-yellow border-2 border-dark rounded-[20px] px-3 py-1 text-xs font-extrabold text-dark inline-block">
+                  {post.score}/10
+                </span>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Mom Animation Section */}
+      <MomAnimation enabled={true} />
     </div>
   );
 }
