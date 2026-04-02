@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Lilita_One, Nunito } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/ui/Navbar";
@@ -18,7 +18,6 @@ const nunito = Nunito({
 export const metadata: Metadata = {
   title: "Mumma's Kitchen - AI Cooking Assistant",
   description: "Cook with Mumma - Step-by-step AI cooking assistant for beginners",
-  viewport: 'width=device-width, initial-scale=1',
   themeColor: '#FFD966',
   appleWebApp: {
     capable: true,
@@ -37,6 +36,11 @@ export const metadata: Metadata = {
     title: 'Mumma\'s Kitchen - AI Cooking Assistant',
     description: 'Cook with Mumma - Step-by-step AI cooking assistant for beginners',
   },
+};
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
 };
 
 export default function RootLayout({

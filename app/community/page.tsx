@@ -1,3 +1,6 @@
+'use client';
+
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Button from '@/components/ui/Button';
 import Card from '@/components/ui/Card';
@@ -6,116 +9,61 @@ interface CommunityPost {
   id: string;
   caption: string;
   createdAt: string;
-  user: { name: string } | null;
+  user: {
+    name: string;
+    image?: string;
+    username?: string;
+  } | null;
   result: {
     score: number;
     recipeName: string;
     foodPhotoUrl?: string;
     selfieUrl?: string;
   };
+  sessionId: string; // Add session ID for navigation
 }
 
-async function getCommunityPosts(): Promise<{ posts: CommunityPost[] }> {
-  try {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/community`, {
-      cache: 'no-store',
-    });
-    
-    if (!response.ok) {
-      throw new Error('Failed to fetch community posts');
+export default function CommunityPage() {
+  const [posts, setPosts] = useState<CommunityPost[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+
+  useEffect(() => {
+    fetchPosts();
+  }, [page]);
+
+  const fetchPosts = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch(`/api/community?page=${page}&limit=12`);
+      if (response.ok) {
+        const data = await response.json();
+        if (page === 1) {
+          setPosts(data.posts);
+        } else {
+          setPosts(prev => [...prev, ...data.posts]);
+        }
+        setHasMore(data.hasMore);
+      }
+    } catch (error) {
+      console.error('Error fetching community posts:', error);
+    } finally {
+      setLoading(false);
     }
-    
-    return await response.json();
-  } catch (error) {
-    console.error('Error fetching community posts:', error);
-    // Return sample data for demo
-    return {
-      posts: [
-        {
-          id: '2',
-          caption: "Mumma's tips were 🔥",
-          createdAt: new Date().toISOString(),
-          user: { name: 'Arjun M.' },
-          result: {
-            score: 8,
-            recipeName: 'Dal Tadka',
-          },
-        },
-        {
-          id: '3',
-          caption: 'PERFECT SCORE!! 🎉',
-          createdAt: new Date().toISOString(),
-          user: { name: 'Sneha K.' },
-          result: {
-            score: 10,
-            recipeName: 'Aloo Paratha',
-          },
-        },
-        {
-          id: '4',
-          caption: 'Still learning haha',
-          createdAt: new Date().toISOString(),
-          user: { name: 'Dev P.' },
-          result: {
-            score: 7,
-            recipeName: 'Maggi Masala',
-          },
-        },
-        {
-          id: '5',
-          caption: 'Asked mumma everything lol',
-          createdAt: new Date().toISOString(),
-          user: { name: 'Ananya T.' },
-          result: {
-            score: 9,
-            recipeName: 'Paneer Bhurji',
-          },
-        },
-        {
-          id: '6',
-          caption: 'Southern style done right!',
-          createdAt: new Date().toISOString(),
-          user: { name: 'Karthik R.' },
-          result: {
-            score: 8,
-            recipeName: 'Tomato Rice',
-          },
-        },
-      ],
-    };
-  }
-}
-
-const getEmojiForRecipe = (recipeName: string): string => {
-  const emojiMap: { [key: string]: string } = {
-    'Dal Tadka': '🥘',
-    'Aloo Paratha': '🫓',
-    'Maggi Masala': '🍜',
-    'Paneer Bhurji': '🧀',
-    'Tomato Rice': '🍚',
   };
-  return emojiMap[recipeName] || '🍽️';
-};
 
-const getBgColorForRecipe = (recipeName: string): string => {
-  const colorMap: { [key: string]: string } = {
-    'Dal Tadka': 'bg-blue',
-    'Aloo Paratha': 'bg-green',
-    'Maggi Masala': 'bg-orange',
-    'Paneer Bhurji': 'bg-orange',
-    'Tomato Rice': 'bg-blue',
+  const loadMore = () => {
+    if (hasMore && !loading) {
+      setPage(prev => prev + 1);
+    }
   };
-  return colorMap[recipeName] || 'bg-yellow';
-};
-
-export default async function CommunityPage() {
-  const { posts } = await getCommunityPosts();
 
   return (
     <div className="main-container fade-up">
       <div className="flex items-center justify-between mb-4 flex-wrap gap-2.5">
         <div>
-          <h2 className="font-lilita text-2xl text-dark">Community <span className="emoji-cheese"></span></h2>
+          <h2 className="font-lilita text-2xl text-dark">Community</h2>
           <p className="text-xs font-bold text-dark/50 mt-0.5">
             see what everyone's making! <span className="emoji-sparkle"></span>
           </p>
@@ -127,34 +75,131 @@ export default async function CommunityPage() {
         </Link>
       </div>
 
+      {/* Loading State */}
+      {loading && page === 1 && (
+        <div className="grid grid-cols-2 gap-3">
+          {[...Array(6)].map((_, i) => (
+            <Card key={i} className="animate-pulse">
+              <div className="h-[200px] bg-gray-100"></div>
+            </Card>
+          ))}
+        </div>
+      )}
+
+      {/* Community Posts Grid */}
       <div className="grid grid-cols-2 gap-3">
         {posts.map((post) => (
-          <Card 
-            key={post.id}
-            className="overflow-hidden cursor-pointer hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-custom-hover transition-all"
-          >
-            <div className={`${getBgColorForRecipe(post.result.recipeName)} h-[90px] flex items-center justify-center text-[42px] border-b-2 border-dark`}>
-              {getEmojiForRecipe(post.result.recipeName)}
-            </div>
-            <div className="p-3">
-              <h3 className="font-lilita text-sm text-dark mb-0.75">
-                {post.result.recipeName}
-              </h3>
-              <p className="text-xs font-bold text-dark/50 mb-2">
-                by {post.user?.name || 'Anonymous'}
-              </p>
-              {post.caption && (
-                <p className="text-xs font-bold text-dark/60 mb-2 italic">
-                  "{post.caption}"
-                </p>
-              )}
-              <span className="bg-yellow border-2 border-dark rounded-[20px] px-3 py-1 text-xs font-extrabold text-dark inline-block">
-                {post.result.score}/10
-              </span>
-            </div>
-          </Card>
+          <Link key={post.id} href={`/recipe/${post.sessionId}`}>
+            <Card 
+              className="overflow-hidden cursor-pointer hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-custom-hover transition-all"
+            >
+              {/* Poster-style Card */}
+              <div className="relative">
+                {/* Header with Recipe Name */}
+                <div className="bg-yellow border-2 border-dashed border-dark px-3 py-2">
+                  <div className="font-lilita text-sm font-bold text-dark text-center">
+                    {post.result.recipeName}
+                  </div>
+                </div>
+
+                {/* Photo Area */}
+                <div className="relative h-[180px] bg-gray-50">
+                  {post.result.foodPhotoUrl ? (
+                    <img 
+                      src={post.result.foodPhotoUrl} 
+                      alt={post.result.recipeName}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center text-4xl">
+                      🍽️
+                    </div>
+                  )}
+                  
+                  {/* Score Badge */}
+                  <div className="absolute top-2 right-2 bg-pink border-2 border-dark rounded-full w-12 h-12 flex items-center justify-center shadow-custom-small">
+                    <span className="font-lilita text-xs font-bold text-white">
+                      {post.result.score}/10
+                    </span>
+                  </div>
+                </div>
+
+                {/* User Info and Caption */}
+                <div className="p-3">
+                  <div className="flex items-center gap-2 mb-2">
+                    {/* User Avatar */}
+                    <div className="w-8 h-8 rounded-full overflow-hidden border-2 border-dark flex-shrink-0">
+                      {post.user?.image ? (
+                        <img 
+                          src={post.user.image} 
+                          alt={post.user.name}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <div className="w-full h-full bg-blue flex items-center justify-center text-xs">
+                          👤
+                        </div>
+                      )}
+                    </div>
+                    
+                    {/* User Name */}
+                    <div className="flex-1 min-w-0">
+                      <div className="font-nunito font-bold text-dark text-sm">
+                        {post.user?.name || 'Anonymous'}
+                      </div>
+                      {post.user?.username && (
+                        <div className="text-xs font-bold text-dark/60">
+                          @{post.user.username}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Mumma Bubble */}
+                  <div className="relative">
+                    <div className="bg-yellow border-2 border-dark rounded-[14px] rounded-tl-[4px] p-3 text-sm font-bold text-dark leading-relaxed shadow-custom">
+                      {post.caption ? (
+                        <>"{post.caption}"</>
+                      ) : (
+                        <span className="text-dark/60 italic">No caption provided</span>
+                      )}
+                    </div>
+                    {/* Bubble Tail */}
+                    <div className="absolute -bottom-2 left-4 w-0 h-0 border-l-8 border-l-transparent border-b-8 border-b-yellow border-r-transparent transform rotate-45"></div>
+                  </div>
+                </div>
+              </div>
+            </Card>
+          </Link>
         ))}
       </div>
+
+      {/* Load More Button */}
+      {hasMore && !loading && (
+        <div className="text-center mt-6">
+          <Button 
+            onClick={loadMore}
+            variant="secondary"
+            className="px-6"
+          >
+            {loading ? 'Loading...' : 'Load More'}
+          </Button>
+        </div>
+      )}
+
+      {/* No Posts State */}
+      {!loading && posts.length === 0 && (
+        <div className="text-center py-12">
+          <div className="text-6xl mb-4">🍽️</div>
+          <h3 className="font-lilita text-xl text-dark mb-2">No community posts yet</h3>
+          <p className="text-sm font-bold text-dark/60 mb-4">
+            Be the first to share your cooking creations!
+          </p>
+          <Link href="/cook">
+            <Button>Start Cooking</Button>
+          </Link>
+        </div>
+      )}
     </div>
   );
 }

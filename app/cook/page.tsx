@@ -123,7 +123,7 @@ export default function IngredientPicker() {
         <Link href="/">
           <Button variant="secondary">← back</Button>
         </Link>
-        <h2 className="font-lilita text-2xl text-dark heading-responsive">What's in your kitchen? <span className="emoji-cheese emoji-mobile"></span></h2>
+        <h2 className="font-lilita text-2xl text-dark heading-responsive">What's in your kitchen?</h2>
       </div>
 
       {/* Mom's Message */}
@@ -205,7 +205,7 @@ export default function IngredientPicker() {
         onClick={startCooking}
         disabled={!ingredients.length || isLoading}
       >
-        <span dangerouslySetInnerHTML={{ __html: !ingredients.length ? 'add ingredients first ↑' : '<span class="emoji-cheese"></span> Let Mumma decide! →' }} />
+        <span dangerouslySetInnerHTML={{ __html: !ingredients.length ? 'add ingredients first ↑' : 'Let Mumma decide! →' }} />
       </Button>
     </div>
   );

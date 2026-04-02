@@ -20,7 +20,12 @@ export async function GET(request: NextRequest) {
               selfieUrl: true,
             },
           },
-          user: { select: { name: true } },
+          user: { 
+            select: { 
+              name: true, 
+              image: true
+            } 
+          },
         },
         orderBy: { createdAt: "desc" },
         skip,
@@ -32,11 +37,16 @@ export async function GET(request: NextRequest) {
     ])
 
     return ok({
-      posts: posts.map((p) => ({
+      posts: posts.map((p: any) => ({
         id: p.id,
         caption: p.caption,
         createdAt: p.createdAt,
-        user: p.user ? { name: p.user.name } : null,
+        sessionId: p.resultId, // Use resultId as sessionId for navigation
+        user: p.user ? { 
+          name: p.user.name, 
+          image: p.user.image,
+          username: p.user.username 
+        } : null,
         result: p.result,
       })),
       total,

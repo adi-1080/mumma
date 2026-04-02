@@ -30,9 +30,6 @@ export default function LandingPage() {
         <Link href="/cook" className="btn-primary btn-mobile inline-block w-fit">
           Start Cooking →
         </Link>
-        <div className="absolute -right-6 -bottom-8 rotate-12 z-0 opacity-90 scale-[0.7] transform-gpu">
-          <Cheese2D />
-        </div>
       </div>
 
       {/* Mom's Message */}
@@ -41,7 +38,7 @@ export default function LandingPage() {
           <AppLogo className="w-full h-full object-cover" />
         </div>
         <div className="bg-yellow border-[2.5px] border-dark rounded-[14px] rounded-tl-[4px] p-3.5 text-sm font-bold text-dark leading-relaxed flex-1 shadow-custom">
-          Hey beta! Mumma's here to help you cook <span className="emoji-cheese emoji-mobile"></span><br />
+          Hey beta! Mumma's here to help you cook <br />
           <span className="text-xs opacity-65">Tell me what you have — I'll figure out perfect dish!</span>
         </div>
       </div>

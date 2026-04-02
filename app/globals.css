@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@config "../tailwind.config.ts";
 
 /* Add this block to force the pointer cursor on all buttons */
 @layer base {
@@ -451,10 +452,11 @@ body {
   font-family: system-ui, sans-serif;
   cursor: pointer;
   pointer-events: none;
-  z-index: 100;
+  z-index: 40;
 }
 
-.mom-animation-stage * {
+.mom-animation-stage .mom-wrapper,
+.mom-animation-stage .mom-tip {
   pointer-events: auto;
 }
 
