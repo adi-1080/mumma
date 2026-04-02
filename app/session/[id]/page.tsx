@@ -5,6 +5,7 @@ import { useParams, useRouter } from 'next/navigation';
 import Button from '@/components/ui/Button';
 import Card from '@/components/ui/Card';
 import AppLogo from '@/components/ui/AppLogo';
+import { PosterGenerator } from '@/components/ui/PosterGenerator';
 
 interface Step {
   id: string;
@@ -46,6 +47,9 @@ export default function CookingSession() {
   const [isPublishing, setIsPublishing] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [foodPhotoDataUrl, setFoodPhotoDataUrl] = useState<string | null>(null);
+  const [selfieDataUrl, setSelfieDataUrl] = useState<string | null>(null);
+  const [userData, setUserData] = useState<any>(null);
 
   const chatContainerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -197,6 +201,50 @@ export default function CookingSession() {
       setIsPublishing(false);
     }
   };
+
+  const fileToDataUrl = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result as string);
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  };
+
+  // Convert food photo to data URL when it's selected
+  useEffect(() => {
+    if (foodPic) {
+      fileToDataUrl(foodPic).then(setFoodPhotoDataUrl).catch(console.error);
+    } else {
+      setFoodPhotoDataUrl(null);
+    }
+  }, [foodPic]);
+
+  // Convert selfie to data URL when it's selected
+  useEffect(() => {
+    if (selfie) {
+      fileToDataUrl(selfie).then(setSelfieDataUrl).catch(console.error);
+    } else {
+      setSelfieDataUrl(null);
+    }
+  }, [selfie]);
+
+  // Fetch user data
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const response = await fetch('/api/user/profile');
+        if (response.ok) {
+          const data = await response.json();
+          setUserData(data.user);
+        }
+      } catch (error) {
+        console.error('Failed to fetch user data:', error);
+      }
+    };
+    
+    fetchUserData();
+  }, []);
 
   const resetApp = () => {
     router.push('/cook');
@@ -363,7 +411,6 @@ export default function CookingSession() {
                   <div className="text-3xl">😊</div>
                 )}
               </div>
-              <div className="text-center text-[10px] font-bold text-dark mt-1">your selfie</div>
             </div>
 
             {/* Score Overlay (Bottom Right) */}
@@ -374,7 +421,6 @@ export default function CookingSession() {
                   <span className="font-lilita text-[18px] text-dark/70">/10</span>
                 </div>
               </div>
-              <div className="text-center text-[10px] font-bold text-dark mt-1.5">Mumma's Rating</div>
             </div>
           </div>
 
@@ -405,7 +451,7 @@ export default function CookingSession() {
               disabled={isPublishing} 
               className="flex-1 bg-[#ED5B97] hover:bg-[#D94A84] text-white font-lilita text-lg tracking-wide rounded-[30px] p-4 transition-all shadow-sm disabled:opacity-50 flex items-center justify-center gap-2 border-[2.5px] border-transparent cursor-pointer"
             >
-              {isPublishing ? 'Sharing...' : <>Share Poster 📸</>}
+              {isPublishing ? 'Sharing...' : <>Share to Community 🌍</>}
             </button>
             <button 
               onClick={resetApp} 
@@ -414,6 +460,18 @@ export default function CookingSession() {
               <div className="font-lilita text-[#F5B827] text-[15px] tracking-wide">mumma's kitchen ✨</div>
               <div className="text-[9px] text-[#FAF4EB] font-bold tracking-widest opacity-80 mt-0.5">cook with love, share with world</div>
             </button>
+          </div>
+
+          {/* Poster Generation Section */}
+          <div className="mt-6 px-1">
+            <PosterGenerator
+              recipeName={session.recipeName}
+              score={score!}
+              userName={userData?.name || 'You'}
+              userImage={selfieDataUrl || userData?.image || undefined}
+              foodPhotoUrl={foodPhotoDataUrl || undefined}
+              caption={`I made ${session.recipeName} with Mumma's Kitchen!`}
+            />
           </div>
         </div>
         

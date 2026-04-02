@@ -7,21 +7,20 @@ datasource db {
 }
 
 model User {
-  id            String    @id
-  name          String
-  email         String    @unique
-  emailVerified Boolean   @default(false)
-  image         String?
-  username      String?   @unique
-  bio           String?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-  accounts      Account[]
-  sessions      Session[]
-
-  cookingSessions CookingSession[]
-  cookResults     CookResult[]
+  id              String           @id
+  name            String
+  email           String           @unique
+  emailVerified   Boolean          @default(false)
+  image           String?
+  username        String?          @unique
+  bio             String?
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
   communityPosts  CommunityPost[]
+  cookResults     CookResult[]
+  cookingSessions CookingSession[]
+  accounts        Account[]
+  sessions        Session[]
 
   @@map("user")
 }
@@ -73,8 +72,6 @@ model Verification {
   @@map("verification")
 }
 
-// ── MummaCooks Models ──────────────────────────────────────────
-
 model CookingSession {
   id          String        @id @default(cuid())
   userId      String?
@@ -83,15 +80,72 @@ model CookingSession {
   recipeDesc  String
   totalSteps  Int
   status      SessionStatus @default(IN_PROGRESS)
-  steps       CookingStep[]
-  result      CookResult?
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @updatedAt
-
-  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+  result      CookResult?
+  user        User?         @relation(fields: [userId], references: [id])
+  steps       CookingStep[]
 
   @@index([userId])
   @@index([status])
+}
+
+model CookingStep {
+  id          String         @id @default(cuid())
+  sessionId   String
+  stepNumber  Int
+  title       String
+  instruction String
+  isCompleted Boolean        @default(false)
+  session     CookingSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  chats       StepChat[]
+
+  @@unique([sessionId, stepNumber])
+  @@index([sessionId])
+}
+
+model StepChat {
+  id        String      @id @default(cuid())
+  stepId    String
+  role      ChatRole
+  content   String
+  createdAt DateTime    @default(now())
+  step      CookingStep @relation(fields: [stepId], references: [id], onDelete: Cascade)
+
+  @@index([stepId])
+}
+
+model CookResult {
+  id            String         @id @default(cuid())
+  sessionId     String         @unique
+  userId        String?
+  score         Int
+  foodPhotoUrl  String?
+  selfieUrl     String?
+  isPublished   Boolean        @default(false)
+  publishedAt   DateTime?
+  recipeName    String
+  ingredients   Json
+  createdAt     DateTime       @default(now())
+  communityPost CommunityPost?
+  session       CookingSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  user          User?          @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([isPublished])
+}
+
+model CommunityPost {
+  id        String     @id @default(cuid())
+  resultId  String     @unique
+  userId    String?
+  caption   String?
+  createdAt DateTime   @default(now())
+  result    CookResult @relation(fields: [resultId], references: [id], onDelete: Cascade)
+  user      User?      @relation(fields: [userId], references: [id])
+
+  @@index([createdAt])
+  @@index([userId])
 }
 
 enum SessionStatus {
@@ -99,69 +153,7 @@ enum SessionStatus {
   COMPLETED
 }
 
-model CookingStep {
-  id          String   @id @default(cuid())
-  sessionId   String
-  stepNumber  Int
-  title       String
-  instruction String
-  isCompleted Boolean  @default(false)
-  chats       StepChat[]
-
-  session CookingSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
-
-  @@index([sessionId])
-  @@unique([sessionId, stepNumber])
-}
-
-model StepChat {
-  id        String   @id @default(cuid())
-  stepId    String
-  role      ChatRole
-  content   String   @db.Text
-  createdAt DateTime @default(now())
-
-  step CookingStep @relation(fields: [stepId], references: [id], onDelete: Cascade)
-
-  @@index([stepId])
-}
-
 enum ChatRole {
   USER
   MOM
-}
-
-model CookResult {
-  id           String    @id @default(cuid())
-  sessionId    String    @unique
-  userId       String?
-  score        Int
-  foodPhotoUrl String?
-  selfieUrl    String?
-  isPublished  Boolean   @default(false)
-  publishedAt  DateTime?
-  recipeName   String
-  ingredients  Json
-  createdAt    DateTime  @default(now())
-
-  session       CookingSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
-  user          User?          @relation(fields: [userId], references: [id], onDelete: SetNull)
-  communityPost CommunityPost?
-
-  @@index([userId])
-  @@index([isPublished])
-}
-
-model CommunityPost {
-  id        String   @id @default(cuid())
-  resultId  String   @unique
-  userId    String?
-  caption   String?  @db.Text
-  createdAt DateTime @default(now())
-
-  result CookResult @relation(fields: [resultId], references: [id], onDelete: Cascade)
-  user   User?      @relation(fields: [userId], references: [id], onDelete: SetNull)
-
-  @@index([createdAt])
-  @@index([userId])
 }
