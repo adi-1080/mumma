@@ -11,12 +11,14 @@ export default function LoginPage() {
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
   const [error, setError] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError('');
+    setSuccessMessage('');
 
     try {
       if (isLogin) {
@@ -38,7 +40,10 @@ export default function LoginPage() {
         if (res.error) {
           setError(res.error.message || 'Sign up failed');
         } else {
-          window.location.href = '/cook';
+          setSuccessMessage("Check your inbox for a welcome message from Mumma! Redirecting...");
+          setTimeout(() => {
+            window.location.href = '/cook';
+          }, 3000);
         }
       }
     } catch (err: any) {
@@ -62,6 +67,12 @@ export default function LoginPage() {
         {error && (
           <div className="bg-red-50 border-[2px] border-red-500 text-red-600 rounded-[12px] p-2.5 mb-4 text-xs font-extrabold text-left">
             {error}
+          </div>
+        )}
+
+        {successMessage && (
+          <div className="bg-green/30 border-[2px] border-green text-dark rounded-[12px] p-2.5 mb-4 text-xs font-extrabold text-left">
+            {successMessage}
           </div>
         )}
 

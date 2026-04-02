@@ -115,7 +115,7 @@ export default async function CommunityPage() {
     <div className="main-container fade-up">
       <div className="flex items-center justify-between mb-4 flex-wrap gap-2.5">
         <div>
-          <h2 className="font-lilita text-2xl text-dark">Community <span className="emoji-cheese"></span></h2>
+          <h2 className="font-lilita text-2xl text-dark">Community</h2>
           <p className="text-xs font-bold text-dark/50 mt-0.5">
             see what everyone's making! <span className="emoji-sparkle"></span>
           </p>

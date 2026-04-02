@@ -19,7 +19,7 @@ export default function Navbar() {
   };
 
   return (
-    <nav className="nav-container nav-mobile">
+    <nav className="nav-container nav-mobile relative !z-[9999]">
       <div className="flex items-center gap-2 font-lilita text-white text-xl border-none">
         <div className="w-10 h-10 rounded-[12px] overflow-hidden flex-shrink-0 shadow-custom-small bg-white">
           <AppLogo className="w-full h-full object-cover" />

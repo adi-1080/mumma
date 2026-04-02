@@ -306,7 +306,7 @@ useEffect(() => {
   return (
     <div
       ref={stageRef}
-      className="mom-animation-stage"
+      className="mom-animation-stage !z-10 pointer-events-none"
       onClick={handleStageClick}
     >
       {/* Background circles */}
@@ -315,7 +315,7 @@ useEffect(() => {
       <div className="bg-circle bg-circle-yellow" />
 
       {/* Mom Wrapper */}
-      <div ref={momWrapperRef} className="mom-wrapper">
+      <div ref={momWrapperRef} className="mom-wrapper pointer-events-auto">
         <div ref={momInnerRef} className="mi aF">
           <div ref={bubbleRef} className={`bub ${bubbleClass} ${showBubble ? 'show' : ''}`}>
             {bubbleText}
@@ -466,7 +466,7 @@ useEffect(() => {
         </div>
       </div>
 
-      <div className="mom-tip">tap to call mumma!</div>
+      <div className="mom-tip pointer-events-auto">tap to call mumma!</div>
     </div>
   );
 }
