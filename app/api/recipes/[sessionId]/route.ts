@@ -1,6 +1,7 @@
 import { NextRequest } from "next/server"
 import { prisma } from "@/lib/prisma"
 import { ok, err } from "@/lib/api-response"
+import { getOptionalSession } from "@/lib/auth-session"
 
 export async function GET(
   request: NextRequest,
@@ -41,9 +42,15 @@ export async function GET(
 
     if (!session) return err("recipe_not_found", 404)
 
-    // Only show recipes that are published or belong to the current user
-    if (!session.result?.isPublished) {
-      return err("recipe_not_public", 403)
+    // Allow viewing recipes if they're published or belong to current user
+    // For community viewing, we should allow published recipes
+    // For personal viewing, user should be able to see their own recipes
+    if (session.result && !session.result.isPublished) {
+      // If recipe exists but isn't published, check if it belongs to current user
+      const currentUserId = await getOptionalSession();
+      if (session.userId !== currentUserId) {
+        return err("recipe_not_public", 403)
+      }
     }
 
     return ok({
@@ -52,7 +59,10 @@ export async function GET(
         recipeName: session.recipeName,
         recipeDesc: session.recipeDesc,
         totalSteps: session.totalSteps,
+        status: session.status,
+        ingredients: session.ingredients,
         createdAt: session.createdAt,
+        updatedAt: session.updatedAt,
         steps: session.steps,
         result: session.result,
         user: session.user,

@@ -32,7 +32,7 @@ interface Message {
 export default function CookingSession() {
   const params = useParams();
   const router = useRouter();
-  const sessionId = params.id as string;
+  const sessionId = params.sessionId as string;
 
   const [session, setSession] = useState<Session | null>(null);
   const [currentStep, setCurrentStep] = useState(0);
@@ -40,6 +40,7 @@ export default function CookingSession() {
   const [chatOpen, setChatOpen] = useState(false);
   const [inputMessage, setInputMessage] = useState('');
   const [isWaitingMom, setIsWaitingMom] = useState(false);
+  const [showAllStepsModal, setShowAllStepsModal] = useState(false);
   const [foodPic, setFoodPic] = useState<File | null>(null);
   const [selfie, setSelfie] = useState<File | null>(null);
   const [score, setScore] = useState<number | null>(null);
@@ -68,7 +69,7 @@ export default function CookingSession() {
 
   const fetchSession = async () => {
     try {
-      const response = await fetch(`/api/session/${sessionId}`);
+      const response = await fetch(`/api/sessions/${sessionId}`);
       if (!response.ok) {
         throw new Error('Failed to fetch session');
       }
@@ -91,7 +92,7 @@ export default function CookingSession() {
 
     const step = session.steps[currentStep];
     try {
-      const response = await fetch(`/api/session/${sessionId}/step/${step.id}`, {
+      const response = await fetch(`/api/sessions/${sessionId}/step/${step.id}`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
@@ -134,7 +135,7 @@ export default function CookingSession() {
     setIsWaitingMom(true);
 
     try {
-      const response = await fetch(`/api/session/${sessionId}/step/${session.steps[currentStep].id}/chat`, {
+      const response = await fetch(`/api/sessions/${sessionId}/step/${session.steps[currentStep].id}/chat`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -162,7 +163,7 @@ export default function CookingSession() {
       if (foodPic) formData.append('foodPhoto', foodPic);
       if (selfie) formData.append('selfie', selfie);
 
-      const response = await fetch(`/api/session/${sessionId}/result`, {
+      const response = await fetch(`/api/sessions/${sessionId}/result`, {
         method: 'POST',
         body: formData,
       });
@@ -494,9 +495,17 @@ export default function CookingSession() {
           <div className="text-xs font-extrabold text-dark/45 tracking-wider uppercase">now cooking</div>
           <h3 className="font-lilita text-xl text-dark">{session.recipeName}</h3>
         </div>
-        <span className="bg-yellow border-2 border-dark rounded-[20px] px-3 py-1 text-xs font-extrabold text-dark">
-          {currentStep + 1} / {session.totalSteps}
-        </span>
+        <div className="flex flex-col items-end gap-1">
+          <span className="bg-yellow border-2 border-dark rounded-[20px] px-3 py-1 text-xs font-extrabold text-dark">
+            {currentStep + 1} / {session.totalSteps}
+          </span>
+          <button 
+            onClick={() => setShowAllStepsModal(true)}
+            className="text-[10px] font-extrabold text-dark/60 uppercase tracking-widest underline decoration-2 underline-offset-2 hover:text-dark cursor-pointer transition-colors"
+          >
+            view all
+          </button>
+        </div>
       </div>
 
       <div className="bg-gray-100 rounded-[10px] h-2 border-[1.5px] border-dark overflow-hidden mb-3.5">
@@ -620,6 +629,33 @@ export default function CookingSession() {
             </button>
           </div>
         </Card>
+      )}
+
+      {/* Modal for All Steps */}
+      {showAllStepsModal && (
+        <div className="fixed inset-0 bg-dark/60 z-50 flex flex-col justify-end sm:justify-center p-4 fade-up">
+          <div className="bg-cream border-[3px] border-dark rounded-[24px] max-h-[85vh] flex flex-col overflow-hidden max-w-md mx-auto w-full shadow-custom">
+            <div className="p-4 border-b-2 border-dark flex justify-between items-center bg-yellow">
+               <h2 className="font-lilita text-xl text-dark">All Recipe Steps</h2>
+               <button onClick={() => setShowAllStepsModal(false)} className="w-8 h-8 flex items-center justify-center border-2 border-dark rounded-full bg-pink text-white font-bold cursor-pointer hover:bg-[#D94A84] transition-colors">&times;</button>
+            </div>
+            <div className="p-4 overflow-y-auto flex-1 space-y-4">
+              {session.steps.map(step => (
+                <div key={step.id} className={`p-4 border-2 border-dark rounded-[16px] ${step.isCompleted ? 'bg-dark/5' : 'bg-white shadow-sm'}`}>
+                  <div className="flex items-start gap-3">
+                    <div className={`w-8 h-8 border-2 border-dark rounded-[12px] flex items-center justify-center font-lilita flex-shrink-0 ${step.isCompleted ? 'bg-dark text-white' : 'bg-yellow text-dark'}`}>
+                      {step.stepNumber}
+                    </div>
+                    <div>
+                      <h3 className="font-lilita text-lg text-dark leading-none mb-1.5 text-left">{step.title}</h3>
+                      <p className="text-sm font-bold text-dark/80 text-left leading-relaxed">{step.instruction}</p>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

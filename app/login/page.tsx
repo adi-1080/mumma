@@ -22,12 +22,36 @@ export default function LoginPage() {
 
     try {
       if (isLogin) {
+        // First check if user exists to give better error messages
+        const userCheckResponse = await fetch('/api/auth/user-exists', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email })
+        });
+        
+        const userExists = await userCheckResponse.json();
+        
+        if (!userExists.exists) {
+          setError('Email not registered. No account found with this email. Try signing up!');
+          setLoading(false);
+          return;
+        }
+        
         const res = await authClient.signIn.email({
           email,
           password
         });
         if (res.error) {
-          setError(res.error.message || 'Invalid credentials');
+          // Handle different types of authentication errors
+          const errorMessage = res.error.message?.toLowerCase() || '';
+          
+          if (errorMessage.includes('invalid') || errorMessage.includes('credentials')) {
+            setError('Invalid email or password. Please check your credentials and try again.');
+          } else if (errorMessage.includes('database') || errorMessage.includes('connection')) {
+            setError('Database connection error. Please try again in a moment.');
+          } else {
+            setError(res.error.message || 'Login failed. Please try again.');
+          }
         } else {
           window.location.href = '/cook';
         }
@@ -38,16 +62,38 @@ export default function LoginPage() {
           name: name || email.split('@')[0]
         });
         if (res.error) {
-          setError(res.error.message || 'Sign up failed');
+          // Handle different types of sign-up errors
+          const errorMessage = res.error.message?.toLowerCase() || '';
+          
+          if (errorMessage.includes('already exists') || errorMessage.includes('duplicate') || errorMessage.includes('user already exists')) {
+            setError('Email already registered. An account with this email already exists. Try logging in!');
+          } else if (errorMessage.includes('password') || errorMessage.includes('weak')) {
+            setError('Password is too weak. Please choose a stronger password.');
+          } else if (errorMessage.includes('email') || errorMessage.includes('invalid')) {
+            setError('Please enter a valid email address.');
+          } else if (errorMessage.includes('database') || errorMessage.includes('connection')) {
+            setError('Database connection error. Please try again in a moment.');
+          } else {
+            setError(res.error.message || 'Sign up failed. Please try again.');
+          }
         } else {
-          setSuccessMessage("Check your inbox for a welcome message from Mumma! Redirecting...");
+          setSuccessMessage("Account created successfully! Check your inbox for a welcome message from Mumma! Redirecting...");
           setTimeout(() => {
             window.location.href = '/cook';
           }, 3000);
         }
       }
     } catch (err: any) {
-      setError(err?.message || 'An unexpected error occurred');
+      // Handle unexpected errors including database connection issues
+      const errorMessage = err?.message?.toLowerCase() || '';
+      
+      if (errorMessage.includes('database') || errorMessage.includes('connection') || errorMessage.includes('prisma')) {
+        setError('Unable to connect to database. Please check your connection and try again.');
+      } else if (errorMessage.includes('network') || errorMessage.includes('fetch')) {
+        setError('Network error. Please check your internet connection and try again.');
+      } else {
+        setError(err?.message || 'An unexpected error occurred. Please try again.');
+      }
     } finally {
       setLoading(false);
     }

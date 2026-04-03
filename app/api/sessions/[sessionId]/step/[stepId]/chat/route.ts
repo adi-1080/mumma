@@ -7,10 +7,10 @@ import { StepChatSchema } from "@/lib/validators/session"
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string; stepId: string }> }
+  { params }: { params: Promise<{ sessionId: string; stepId: string }> }
 ) {
   try {
-    const { id, stepId } = await params
+    const { sessionId, stepId } = await params
     const body = await request.json()
     const parsed = StepChatSchema.safeParse(body)
     if (!parsed.success) return err("message: 1-500 chars required", 400)
@@ -20,7 +20,7 @@ export async function POST(
     // Fetch step + session for context
     const step = await prisma.cookingStep.findFirst({
       where: { 
-        sessionId: id,
+        sessionId: sessionId,
         OR: [
           { id: stepId },
           ...(isNaN(Number(stepId)) ? [] : [{ stepNumber: Number(stepId) }])
@@ -87,7 +87,7 @@ Never break character. You are always their mom, always in the kitchen with them
       momMessage: { id: momMsg.id, role: momMsg.role, content: momMsg.content, createdAt: momMsg.createdAt },
     })
   } catch (e) {
-    console.error("POST /api/session/[id]/step/[stepId]/chat error:", e)
+    console.error("POST /api/sessions/[sessionId]/step/[stepId]/chat error:", e)
     return err("internal_server_error", 500)
   }
 }

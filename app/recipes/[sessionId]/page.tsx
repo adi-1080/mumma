@@ -51,7 +51,7 @@ export default function RecipeDetailPage() {
   const fetchRecipe = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`/api/recipe/${sessionId}`);
+      const response = await fetch(`/api/recipes/${sessionId}`);
       if (response.ok) {
         const data = await response.json();
         setRecipe(data.recipe);
@@ -113,15 +113,17 @@ export default function RecipeDetailPage() {
           </Link>
           <h2 className="font-lilita text-2xl text-dark">{recipe.recipeName}</h2>
           <p className="text-xs font-bold text-dark/50 mt-0.5">
-            by {recipe.user.name} • {new Date(recipe.createdAt).toLocaleDateString()}
+            by {recipe.user ? recipe.user.name : "Anonymous"} • {new Date(recipe.createdAt).toLocaleDateString()}
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <div className="bg-pink border-2 border-dark rounded-full w-12 h-12 flex items-center justify-center shadow-custom-small">
-            <span className="font-lilita text-xs font-bold text-white">
-              {recipe.result.score}/10
-            </span>
-          </div>
+          {recipe.result && (
+            <div className="bg-pink border-2 border-dark rounded-full w-12 h-12 flex items-center justify-center shadow-custom-small">
+              <span className="font-lilita text-xs font-bold text-white">
+                {recipe.result.score}/10
+              </span>
+            </div>
+          )}
         </div>
       </div>
 
@@ -133,7 +135,7 @@ export default function RecipeDetailPage() {
         </p>
         
         {/* Recipe Photo */}
-        {recipe.result.foodPhotoUrl && (
+        {recipe.result?.foodPhotoUrl && (
           <div className="mt-4">
             <img 
               src={recipe.result.foodPhotoUrl} 

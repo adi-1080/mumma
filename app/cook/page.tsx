@@ -49,7 +49,7 @@ export default function IngredientPicker() {
     
     setIsLoading(true);
     try {
-      const response = await fetch('/api/session/start', {
+      const response = await fetch('/api/sessions/start', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -62,7 +62,7 @@ export default function IngredientPicker() {
       }
 
       const data = await response.json();
-      router.push(`/session/${data.session.id}`);
+      router.push(`/sessions/${data.session.id}`);
     } catch (error) {
       console.error('Error starting cooking session:', error);
       // Handle error - show toast or alert

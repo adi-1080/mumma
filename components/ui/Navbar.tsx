@@ -15,17 +15,20 @@ export default function Navbar() {
     if (path === '/' && pathname === '/') return 'active';
     if (path === '/cook' && pathname.startsWith('/cook')) return 'active';
     if (path === '/community' && pathname === '/community') return 'active';
+    if (path === '/recipes' && pathname.startsWith('/recipes')) return 'active';
     return '';
   };
 
   return (
     <nav className="nav-container nav-mobile relative !z-[9999]">
       <div className="flex items-center gap-2 font-lilita text-white text-xl border-none">
-        <div className="w-10 h-10 rounded-[12px] overflow-hidden flex-shrink-0 shadow-custom-small bg-white">
-          <AppLogo className="w-full h-full object-cover" />
-        </div>
-        <span className="mt-1 desktop-only">Mumma's Kitchen</span>
-        <span className="mt-1 mobile-only">Mumma's</span>
+        <Link href="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
+          <div className="w-10 h-10 rounded-[12px] overflow-hidden flex-shrink-0 shadow-custom-small bg-white">
+            <AppLogo className="w-full h-full object-cover" />
+          </div>
+          <span className="mt-1 desktop-only">Mumma's Kitchen</span>
+          <span className="mt-1 mobile-only">Mumma's</span>
+        </Link>
         <div className="flex gap-1 bg-white/10 rounded-[20px] p-1 mobile-hidden ml-4">
           <Link href="/" className={`np block text-center ${getActiveClass('/')}`}>
             Home
@@ -35,6 +38,9 @@ export default function Navbar() {
           </Link>
           <Link href="/community" className={`np block text-center ${getActiveClass('/community')}`}>
             Community
+          </Link>
+          <Link href="/recipes" className={`np block text-center ${getActiveClass('/recipes')}`}>
+            My Recipes
           </Link>
         </div>
         <span className="mt-1 mobile-hidden"></span>
@@ -61,7 +67,7 @@ export default function Navbar() {
               className="bg-white/20 hover:bg-white/30 text-white font-nunito font-bold text-sm px-3 py-2 rounded-[10px] transition-colors mobile-hidden"
               onClick={async () => {
                 await authClient.signOut();
-                window.location.pathname = '/';
+                window.location.href = '/';
               }}
             >
               <span className="desktop-only">Sign Out</span>

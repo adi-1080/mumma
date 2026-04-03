@@ -1,18 +1,18 @@
 import { NextRequest } from "next/server"
 import { prisma } from "@/lib/prisma"
-import { getOptionalSession } from "@/lib/auth-session"
+import { getOptionalSession, requireAuth } from "@/lib/auth-session"
 import { ok, err } from "@/lib/api-response"
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ sessionId: string }> }
 ) {
   try {
-    const { id } = await params
+    const { sessionId } = await params
     const userId = await getOptionalSession()
 
     const session = await prisma.cookingSession.findUnique({
-      where: { id },
+      where: { id: sessionId },
       include: {
         steps: {
           orderBy: { stepNumber: "asc" },
@@ -53,7 +53,40 @@ export async function GET(
       },
     })
   } catch (e) {
-    console.error("GET /api/session/[id] error:", e)
+    console.error("GET /api/sessions/[sessionId] error:", e)
+    return err("internal_server_error", 500)
+  }
+}
+
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: Promise<{ sessionId: string }> }
+) {
+  try {
+    const userId = await requireAuth()
+    const { sessionId } = await params
+
+    // Check if session belongs to user
+    const session = await prisma.cookingSession.findUnique({
+      where: { id: sessionId }
+    })
+
+    if (!session) {
+      return err("session_not_found", 404)
+    }
+
+    if (session.userId !== userId) {
+      return err("unauthorized", 403)
+    }
+
+    // Delete the session and related data
+    await prisma.cookingSession.delete({
+      where: { id: sessionId }
+    })
+
+    return ok({ message: "Cooking session deleted successfully" })
+  } catch (error) {
+    console.error("DELETE /api/sessions/[sessionId] error:", error)
     return err("internal_server_error", 500)
   }
 }

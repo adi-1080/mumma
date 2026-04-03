@@ -6,13 +6,13 @@ import { put } from "@vercel/blob"
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ sessionId: string }> }
 ) {
   try {
-    const { id } = await params
+    const { sessionId } = await params
     const userId = await getOptionalSession()
 
-    const session = await prisma.cookingSession.findUnique({ where: { id } })
+    const session = await prisma.cookingSession.findUnique({ where: { id: sessionId } })
     if (!session) return err("session_not_found", 404)
     if (session.userId && session.userId !== userId) {
       return err("unauthorized", 403)
@@ -23,7 +23,7 @@ export async function POST(
 
     // If result already exists, return it
     const existing = await prisma.cookResult.findUnique({
-      where: { sessionId: id },
+      where: { sessionId: sessionId },
     })
     if (existing) return ok({ result: existing })
 
@@ -37,7 +37,7 @@ export async function POST(
       if (!["image/jpeg", "image/jpg", "image/png"].includes(foodPhoto.type)) {
         return err("foodPhoto must be jpeg, jpg, or png", 400)
       }
-      const blob = await put(`food/${id}-${Date.now()}.${foodPhoto.type === "image/png" ? "png" : "jpg"}`, foodPhoto, { access: "public" })
+      const blob = await put(`food/${sessionId}-${Date.now()}.${foodPhoto.type === "image/png" ? "png" : "jpg"}`, foodPhoto, { access: "public" })
       foodPhotoUrl = blob.url
     }
 
@@ -47,7 +47,7 @@ export async function POST(
       if (!["image/jpeg", "image/jpg", "image/png"].includes(selfie.type)) {
         return err("selfie must be jpeg, jpg, or png", 400)
       }
-      const blob = await put(`selfie/${id}-${Date.now()}.${selfie.type === "image/png" ? "png" : "jpg"}`, selfie, { access: "public" })
+      const blob = await put(`selfie/${sessionId}-${Date.now()}.${selfie.type === "image/png" ? "png" : "jpg"}`, selfie, { access: "public" })
       selfieUrl = blob.url
     }
 
@@ -55,7 +55,7 @@ export async function POST(
 
     const result = await prisma.cookResult.create({
       data: {
-        sessionId: id,
+        sessionId: sessionId,
         userId,
         score,
         foodPhotoUrl,
@@ -77,21 +77,21 @@ export async function POST(
       },
     })
   } catch (e) {
-    console.error("POST /api/session/[id]/result error:", e)
+    console.error("POST /api/sessions/[sessionId]/result error:", e)
     return err("internal_server_error", 500)
   }
 }
 
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ sessionId: string }> }
 ) {
   try {
-    const { id } = await params
+    const { sessionId } = await params
     const userId = await getOptionalSession()
 
     const existing = await prisma.cookResult.findUnique({
-      where: { sessionId: id },
+      where: { sessionId: sessionId },
     })
     
     if (!existing) return err("result_not_found_run_post_first", 404)
@@ -109,7 +109,7 @@ export async function PATCH(
       if (!["image/jpeg", "image/jpg", "image/png"].includes(foodPhoto.type)) {
         return err("foodPhoto must be jpeg, jpg, or png", 400)
       }
-      const blob = await put(`food/${id}-${Date.now()}.${foodPhoto.type === "image/png" ? "png" : "jpg"}`, foodPhoto, { access: "public" })
+      const blob = await put(`food/${sessionId}-${Date.now()}.${foodPhoto.type === "image/png" ? "png" : "jpg"}`, foodPhoto, { access: "public" })
       foodPhotoUrl = blob.url
     }
 
@@ -119,12 +119,12 @@ export async function PATCH(
       if (!["image/jpeg", "image/jpg", "image/png"].includes(selfie.type)) {
         return err("selfie must be jpeg, jpg, or png", 400)
       }
-      const blob = await put(`selfie/${id}-${Date.now()}.${selfie.type === "image/png" ? "png" : "jpg"}`, selfie, { access: "public" })
+      const blob = await put(`selfie/${sessionId}-${Date.now()}.${selfie.type === "image/png" ? "png" : "jpg"}`, selfie, { access: "public" })
       selfieUrl = blob.url
     }
 
     const result = await prisma.cookResult.update({
-      where: { sessionId: id },
+      where: { sessionId: sessionId },
       data: {
         foodPhotoUrl,
         selfieUrl,
@@ -143,7 +143,7 @@ export async function PATCH(
       },
     })
   } catch (e) {
-    console.error("PATCH /api/session/[id]/result error:", e)
+    console.error("PATCH /api/sessions/[sessionId]/result error:", e)
     return err("internal_server_error", 500)
   }
 }
