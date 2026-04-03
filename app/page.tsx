@@ -20,16 +20,29 @@ export default function LandingPage() {
         <div className="text-xs font-extrabold bg-dark text-yellow rounded-[20px] px-3.5 py-1.5 inline-flex items-center justify-center gap-1.5 mb-3.5 tracking-wider">
           <div className="w-4 h-4 rounded-[4px] overflow-hidden bg-white"><AppLogo className="w-full h-full object-cover" /></div> <span className="text-aai">AAI</span> IS HERE TO HELP YOU COOK
         </div>
-        <h1 className="font-lilita text-4xl text-dark mb-2.5 leading-tight tracking-tight heading-responsive">
-          Cook with<br />
-          <span className="text-pink">Mumma <span className="emoji-heart"></span></span>
-        </h1>
-        <p className="text-sm font-bold text-dark/60 mb-5 text-responsive">
-          Step-by-step. Ask anything. Never get stuck.
-        </p>
-        <Link href="/cook" className="btn-primary btn-mobile inline-block w-fit">
-          Start Cooking →
-        </Link>
+        <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+          <div className="flex-1 text-center md:text-left">
+            <h1 className="font-lilita text-4xl text-dark mb-2.5 leading-tight tracking-tight heading-responsive">
+              Cook with<br />
+              <span className="text-pink">Mumma <span className="emoji-heart"></span></span>
+            </h1>
+            <p className="text-sm font-bold text-dark/60 mb-5 text-responsive">
+              Step-by-step. Ask anything. Never get stuck.
+            </p>
+            <Link href="/cook" className="btn-primary btn-mobile inline-block w-fit">
+              Start Cooking →
+            </Link>
+          </div>
+          <div className="hidden md:block mt-6 md:mt-0">
+            <Cheese2D />
+          </div>
+          {/* Mobile Cheese - smaller version */}
+          <div className="md:hidden mt-4 flex justify-center">
+            <div className="w-[120px] h-[120px]">
+              <Cheese2D />
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Mom's Message */}

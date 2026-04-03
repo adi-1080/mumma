@@ -14,6 +14,7 @@ export async function GET(request: NextRequest) {
         include: {
           result: {
             select: {
+              sessionId: true,
               score: true,
               recipeName: true,
               foodPhotoUrl: true,
@@ -41,7 +42,7 @@ export async function GET(request: NextRequest) {
         id: p.id,
         caption: p.caption,
         createdAt: p.createdAt,
-        sessionId: p.resultId, // Use resultId as sessionId for navigation
+        sessionId: p.result.sessionId, // Correctly use the result's actual sessionId
         user: p.user ? { 
           name: p.user.name, 
           image: p.user.image,

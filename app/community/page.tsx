@@ -89,7 +89,7 @@ export default function CommunityPage() {
       {/* Community Posts Grid */}
       <div className="grid grid-cols-2 gap-3">
         {posts.map((post) => (
-          <Link key={post.id} href={`/recipe/${post.sessionId}`}>
+          <Link key={post.id} href={`/recipes/${post.sessionId}`}>
             <Card 
               className="overflow-hidden cursor-pointer hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-custom-hover transition-all"
             >

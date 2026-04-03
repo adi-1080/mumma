@@ -104,7 +104,7 @@ export async function POST(request: NextRequest) {
       },
     })
   } catch (e) {
-    console.error("POST /api/session/start error:", e)
+    console.error("POST /api/sessions/start error:", e)
     return err("internal_server_error", 500)
   }
 }

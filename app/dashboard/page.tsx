@@ -7,7 +7,8 @@ import Card from '@/components/ui/Card';
 import { authClient } from '@/lib/auth-client';
 
 interface UserSession {
-  id: string;
+  id: string; // resultId
+  sessionId: string;
   recipeName: string;
   status: string;
   totalSteps: number;
@@ -50,16 +51,17 @@ export default function DashboardPage() {
     }
   };
 
-  const handleToggleVisibility = async (sessionId: string, currentVisibility: boolean) => {
+  const handleToggleVisibility = async (resultId: string, currentVisibility: boolean) => {
+    if (!resultId) return;
     try {
-      const response = await fetch(`/api/result/${sessionId}/toggle-visibility`, {
+      const response = await fetch(`/api/result/${resultId}/toggle-visibility`, {
         method: 'PATCH',
       });
       
       if (response.ok) {
         setUserSessions(prev => 
           prev.map(s => 
-            s.id === sessionId 
+            s.id === resultId 
               ? { ...s, isPublished: !currentVisibility }
               : s
           )
@@ -142,7 +144,7 @@ export default function DashboardPage() {
             <h4 className="font-nunito font-bold text-dark mb-3">In Progress</h4>
             <div className="space-y-2">
               {inProgressSessions.map((session) => (
-                <Link key={session.id} href={`/session/${session.id}`}>
+                <Link key={session.sessionId} href={`/sessions/${session.sessionId}`}>
                   <div className="flex items-center justify-between p-3 border-2 border-dark rounded-[10px] hover:bg-yellow/50 transition-colors cursor-pointer">
                     <div>
                       <div className="font-nunito font-bold text-dark">{session.recipeName}</div>
@@ -166,9 +168,9 @@ export default function DashboardPage() {
             <h4 className="font-nunito font-bold text-dark mb-3">Completed</h4>
             <div className="space-y-2">
               {completedSessions.map((session) => (
-                <div key={session.id} className="flex items-center justify-between p-3 border-2 border-dark rounded-[10px]">
+                <div key={session.sessionId} className="flex items-center justify-between p-3 border-2 border-dark rounded-[10px]">
                   <div className="flex-1">
-                    <Link href={`/session/${session.id}`} className="block">
+                    <Link href={`/sessions/${session.sessionId}`} className="block">
                       <div className="font-nunito font-bold text-dark hover:text-yellow transition-colors">
                         {session.recipeName}
                       </div>

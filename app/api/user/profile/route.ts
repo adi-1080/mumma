@@ -62,7 +62,8 @@ export async function GET() {
     return ok({
       user,
       sessions: sessions.map(s => ({
-        id: s.id,
+        sessionId: s.id,
+        id: s.result?.id, // Result ID for toggle-visibility
         recipeName: s.recipeName,
         status: s.status,
         totalSteps: s.totalSteps,
