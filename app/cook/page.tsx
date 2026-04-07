@@ -121,7 +121,7 @@ export default function IngredientPicker() {
     <div className="main-container fade-up container-mobile">
       <div className="flex items-center gap-2.5 mb-4.5">
         <Link href="/">
-          <Button variant="secondary">← back</Button>
+          <Button variant="secondary">{'<'} back</Button>
         </Link>
         <h2 className="font-lilita text-2xl text-dark heading-responsive">What's in your kitchen?</h2>
       </div>
@@ -132,7 +132,7 @@ export default function IngredientPicker() {
           <AppLogo className="w-full h-full object-cover" />
         </div>
         <div className="bg-yellow border-[2.5px] border-dark rounded-[14px] rounded-tl-[4px] p-3.5 text-sm font-bold text-dark leading-relaxed flex-1 card-mobile p-responsive">
-          Beta, tell mumma what you have at home! Even just 2–3 things and she'll figure it out <span className="emoji-heart"></span>
+          Beta, tell mumma what you have at home! Even just 2-3 things and she'll figure it out <span className="emoji-heart"></span>
         </div>
       </div>
 
@@ -158,7 +158,7 @@ export default function IngredientPicker() {
                   removeIngredient(index);
                 }}
               >
-                ✕
+                x
               </button>
             </span>
           ))}
@@ -173,7 +173,7 @@ export default function IngredientPicker() {
           />
         </div>
         <div className="text-xs font-bold text-dark/35 mt-1.5">
-          ↵ enter or , comma after each ingredient
+          [enter] or [,] comma after each ingredient
         </div>
       </Card>
 
@@ -205,7 +205,7 @@ export default function IngredientPicker() {
         onClick={startCooking}
         disabled={!ingredients.length || isLoading}
       >
-        <span dangerouslySetInnerHTML={{ __html: !ingredients.length ? 'add ingredients first ↑' : 'Let Mumma decide! →' }} />
+        <span dangerouslySetInnerHTML={{ __html: !ingredients.length ? 'add ingredients first [up]' : 'Let Mumma decide! [right]' }} />
       </Button>
     </div>
   );

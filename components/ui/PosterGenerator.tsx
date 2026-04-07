@@ -336,7 +336,7 @@ export function PosterGenerator({
       ctx.fillStyle = '#8B4513';
       ctx.font = 'italic 36px Georgia';
       ctx.textAlign = 'center';
-      ctx.fillText('👩‍🍳 Mumma\'s Kitchen', canvas.width / 2, canvas.height - 120);
+      ctx.fillText('[Chef] Mumma\'s Kitchen', canvas.width / 2, canvas.height - 120);
 
       // Convert to blob and download
       canvas.toBlob((blob) => {
@@ -372,7 +372,7 @@ export function PosterGenerator({
         disabled={isGenerating}
         className="bg-yellow border-2 border-dark rounded-[10px] px-6 py-3 font-nunito font-bold text-dark hover:bg-yellow/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
       >
-        {isGenerating ? 'Generating Poster...' : '📸 Download Poster'}
+        {isGenerating ? 'Generating Poster...' : 'Download Poster'}
       </button>
       
       <canvas

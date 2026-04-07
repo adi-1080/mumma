@@ -1,0 +1,29 @@
+{
+  "name": "Mumma's Kitchen",
+  "short_name": "Mumma's Kitchen",
+  "description": "Cook with Mumma - Step-by-step AI cooking assistant for beginners",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#FFF8E7",
+  "theme_color": "#FFD966",
+  "orientation": "portrait",
+  "scope": "/",
+  "lang": "en",
+  "icons": [
+    {
+      "src": "/mummalogo.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/mummalogo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "screenshots": [],
+  "categories": ["food", "lifestyle", "utilities"],
+  "prefer_related_applications": false
+}

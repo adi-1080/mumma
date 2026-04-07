@@ -59,7 +59,7 @@ export default function Navbar() {
                 />
               ) : (
                 <div className="w-full h-full bg-yellow flex items-center justify-center text-sm">
-                  👩‍🍳
+                  [Chef]
                 </div>
               )}
             </div>

@@ -291,7 +291,7 @@ export default function CookingSession() {
             <AppLogo className="w-full h-full object-cover" />
           </div>
           <div className="bg-yellow border-[2.5px] border-dark rounded-[14px] rounded-tl-[4px] p-3.5 text-sm font-bold text-dark leading-relaxed flex-1">
-            Arre wah!! Upload a photo of what you made — and show mumma your happy face too! She'll give you a score <span className="emoji-trophy"></span>
+            Arre wah!! Upload a photo of what you made - and show mumma your happy face too! She'll give you a score <span className="emoji-trophy"></span>
           </div>
         </div>
 
@@ -306,11 +306,11 @@ export default function CookingSession() {
                 <img src={URL.createObjectURL(foodPic)} alt="Food" className="w-full h-full object-cover" />
               </div>
             ) : (
-              <div className="text-3xl mb-2">📸</div>
+              <div className="text-3xl mb-2">[Camera]</div>
             )}
             <h3 className="font-lilita text-sm text-dark mb-1">{foodPic ? 'Photo added!' : 'Food photo'}</h3>
             <p className="text-xs font-bold text-dark/45">
-              {foodPic ? 'tap to remove' : 'optional — tap to add'}
+              {foodPic ? 'tap to remove' : 'optional - tap to add'}
             </p>
           </Card>
           <Card className={`text-center cursor-pointer transition-all ${selfie ? 'bg-green border-solid' : 'border-dashed hover:bg-yellow'}`}
@@ -320,7 +320,7 @@ export default function CookingSession() {
                 <img src={URL.createObjectURL(selfie)} alt="Selfie" className="w-full h-full object-cover" />
               </div>
             ) : (
-              <div className="text-3xl mb-2">🤳</div>
+              <div className="text-3xl mb-2">[Selfie]</div>
             )}
             <h3 className="font-lilita text-sm text-dark mb-1">{selfie ? 'Selfie added!' : 'Your selfie'}</h3>
             <p className="text-xs font-bold text-dark/45">
@@ -330,7 +330,7 @@ export default function CookingSession() {
         </div>
 
         <Button fullWidth onClick={getScore} className="mb-2.5">
-          <span className="emoji-trophy"></span> Get my score! →
+          <span className="emoji-trophy"></span> Get my score! {'>'}
         </Button>
         <div className="text-center">
           <button
@@ -452,7 +452,7 @@ export default function CookingSession() {
               disabled={isPublishing} 
               className="flex-1 bg-[#ED5B97] hover:bg-[#D94A84] text-white font-lilita text-lg tracking-wide rounded-[30px] p-4 transition-all shadow-sm disabled:opacity-50 flex items-center justify-center gap-2 border-[2.5px] border-transparent cursor-pointer"
             >
-              {isPublishing ? 'Sharing...' : <>Share to Community 🌍</>}
+              {isPublishing ? 'Sharing...' : <>Share to Community</>}
             </button>
             <button 
               onClick={resetApp} 
