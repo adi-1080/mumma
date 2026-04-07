@@ -1,16 +1,10 @@
-import { neonConfig } from '@neondatabase/serverless';
-import { PrismaNeon } from '@prisma/adapter-neon';
+import { Pool } from 'pg';
+import { PrismaPg } from '@prisma/adapter-pg';
 import { PrismaClient } from '@prisma/client';
-import ws from 'ws';
 
-// Required for Neon to run over WebSockets in standard Node/Next.js routes
-neonConfig.webSocketConstructor = ws;
-
-const connectionString = `${process.env.DATABASE_URL}`;
-
-// Skip creating the Pool entirely. 
-// Pass the config object directly to the PrismaNeon adapter:
-const adapter = new PrismaNeon({ connectionString });
+const connectionString = process.env.DATABASE_URL;
+const pool = new Pool({ connectionString });
+const adapter = new PrismaPg(pool);
 
 const globalForPrisma = global as unknown as { prisma: PrismaClient };
 
