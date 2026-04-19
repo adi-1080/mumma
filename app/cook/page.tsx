@@ -71,6 +71,7 @@ export default function IngredientPicker() {
     }
   };
 
+  // Full page loader only for session check, for startCooking we use button loading
   if (isPending) {
     return (
       <div className="main-container flex items-center justify-center min-h-[600px]">
@@ -101,27 +102,11 @@ export default function IngredientPicker() {
     );
   }
 
-  if (isLoading) {
-    return (
-      <div className="main-container flex items-center justify-center min-h-[600px]">
-        <div className="text-center">
-          <div className="w-[80px] h-[80px] rounded-full mx-auto mb-4 bounce-slow border-[3px] border-dark overflow-hidden bg-white shadow-custom-small"><AppLogo className="w-full h-full object-cover" /></div>
-          <h2 className="font-lilita text-2xl text-dark mb-2">
-            Mumma's thinking<span className="dot-1">.</span><span className="dot-2">.</span><span className="dot-3">.</span>
-          </h2>
-          <p className="text-sm font-bold text-dark/50">
-            Finding the perfect recipe for what you have <span className="emoji-plate"></span>
-          </p>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="main-container fade-up container-mobile">
       <div className="flex items-center gap-2.5 mb-4.5">
         <Link href="/">
-          <Button variant="secondary">← back</Button>
+          <Button variant="secondary">{'<'} back</Button>
         </Link>
         <h2 className="font-lilita text-2xl text-dark heading-responsive">What's in your kitchen?</h2>
       </div>
@@ -132,7 +117,7 @@ export default function IngredientPicker() {
           <AppLogo className="w-full h-full object-cover" />
         </div>
         <div className="bg-yellow border-[2.5px] border-dark rounded-[14px] rounded-tl-[4px] p-3.5 text-sm font-bold text-dark leading-relaxed flex-1 card-mobile p-responsive">
-          Beta, tell mumma what you have at home! Even just 2–3 things and she'll figure it out <span className="emoji-heart"></span>
+          Beta, tell mumma what you have at home! Even just 2-3 things and she'll figure it out <span className="emoji-heart"></span>
         </div>
       </div>
 
@@ -158,7 +143,7 @@ export default function IngredientPicker() {
                   removeIngredient(index);
                 }}
               >
-                ✕
+                x
               </button>
             </span>
           ))}
@@ -173,7 +158,7 @@ export default function IngredientPicker() {
           />
         </div>
         <div className="text-xs font-bold text-dark/35 mt-1.5">
-          ↵ enter or , comma after each ingredient
+          [enter] or [,] comma after each ingredient
         </div>
       </Card>
 
@@ -203,9 +188,11 @@ export default function IngredientPicker() {
       <Button 
         fullWidth 
         onClick={startCooking}
-        disabled={!ingredients.length || isLoading}
+        isLoading={isLoading}
+        loadingText="Mumma's thinking (est. 20s)"
+        disabled={!ingredients.length}
       >
-        <span dangerouslySetInnerHTML={{ __html: !ingredients.length ? 'add ingredients first ↑' : 'Let Mumma decide! →' }} />
+        <span dangerouslySetInnerHTML={{ __html: !ingredients.length ? 'add ingredients first' : 'Let Mumma decide!' }} />
       </Button>
     </div>
   );

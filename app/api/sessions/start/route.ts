@@ -31,7 +31,7 @@ Return this exact JSON:
 }${retry ? "\n\nReturn ONLY raw JSON, no text before or after." : ""}`
 
   const res = await openrouter.chat.completions.create({
-    model: "google/gemini-2.5-flash",
+    model: "openai/gpt-oss-120b:free",
     max_tokens: 1000,
     messages: [
       { role: "system", content: SYSTEM_PROMPT },

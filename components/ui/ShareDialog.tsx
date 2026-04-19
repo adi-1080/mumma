@@ -87,7 +87,7 @@ export function ShareDialog({ isOpen, onClose, posterDataUrl, recipeName }: Shar
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
       <div className="bg-white border-4 border-dark rounded-[20px] max-w-md w-full p-6 shadow-custom">
         <div className="flex items-center justify-between mb-6">
-          <h3 className="font-lilita text-2xl text-dark">Share Your Creation! 🎉</h3>
+          <h3 className="font-lilita text-2xl text-dark">Share Your Creation!</h3>
           <button
             onClick={onClose}
             className="text-2xl font-bold text-dark hover:text-yellow transition-colors"
@@ -112,21 +112,21 @@ export function ShareDialog({ isOpen, onClose, posterDataUrl, recipeName }: Shar
             disabled={isDownloading}
             className="w-full bg-yellow border-2 border-dark rounded-[10px] px-4 py-3 font-nunito font-bold text-dark hover:bg-yellow/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {isDownloading ? 'Downloading...' : '📥 Download Poster'}
+            {isDownloading ? 'Downloading...' : '[Download] Download Poster'}
           </button>
 
           <button
             onClick={sharePoster}
             className="w-full bg-green border-2 border-dark rounded-[10px] px-4 py-3 font-nunito font-bold text-white hover:bg-green/90 transition-colors"
           >
-            📤 Share to Social Media
+            [Share] Share to Social Media
           </button>
 
           <button
             onClick={copyToClipboard}
             className="w-full bg-blue border-2 border-dark rounded-[10px] px-4 py-3 font-nunito font-bold text-white hover:bg-blue/90 transition-colors"
           >
-            📋 Copy Share Text
+            [Clipboard] Copy Share Text
           </button>
         </div>
 
@@ -139,7 +139,7 @@ export function ShareDialog({ isOpen, onClose, posterDataUrl, recipeName }: Shar
 
         {/* Tips */}
         <div className="mt-4 text-xs font-nunito text-dark/60">
-          <p className="mb-1">💡 <strong>Tips:</strong></p>
+          <p className="mb-1"><strong>Tips:</strong></p>
           <ul className="list-disc list-inside space-y-1">
             <li>Perfect for Instagram Stories!</li>
             <li>Works great on WhatsApp, Facebook, Twitter</li>

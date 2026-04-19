@@ -46,6 +46,8 @@ export default function CookingSession() {
   const [score, setScore] = useState<number | null>(null);
   const [resultId, setResultId] = useState<string | null>(null);
   const [isPublishing, setIsPublishing] = useState(false);
+  const [isMarkingDone, setIsMarkingDone] = useState(false);
+  const [isGettingScore, setIsGettingScore] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [foodPhotoDataUrl, setFoodPhotoDataUrl] = useState<string | null>(null);
@@ -91,6 +93,7 @@ export default function CookingSession() {
     if (!session) return;
 
     const step = session.steps[currentStep];
+    setIsMarkingDone(true);
     try {
       const response = await fetch(`/api/sessions/${sessionId}/step/${step.id}`, {
         method: 'PATCH',
@@ -123,6 +126,8 @@ export default function CookingSession() {
       }
     } catch (error) {
       console.error('Error marking step as done:', error);
+    } finally {
+      setIsMarkingDone(false);
     }
   };
 
@@ -158,6 +163,7 @@ export default function CookingSession() {
   };
 
   const getScore = async () => {
+    setIsGettingScore(true);
     try {
       const formData = new FormData();
       if (foodPic) formData.append('foodPhoto', foodPic);
@@ -181,6 +187,8 @@ export default function CookingSession() {
       console.error('Error getting score:', error);
       // Fallback to random score for demo
       setScore(Math.floor(Math.random() * 4) + 7);
+    } finally {
+      setIsGettingScore(false);
     }
   };
 
@@ -291,7 +299,7 @@ export default function CookingSession() {
             <AppLogo className="w-full h-full object-cover" />
           </div>
           <div className="bg-yellow border-[2.5px] border-dark rounded-[14px] rounded-tl-[4px] p-3.5 text-sm font-bold text-dark leading-relaxed flex-1">
-            Arre wah!! Upload a photo of what you made — and show mumma your happy face too! She'll give you a score <span className="emoji-trophy"></span>
+            Arre wah!! Upload a photo of what you made - and show mumma your happy face too! She'll give you a score <span className="emoji-trophy"></span>
           </div>
         </div>
 
@@ -306,11 +314,11 @@ export default function CookingSession() {
                 <img src={URL.createObjectURL(foodPic)} alt="Food" className="w-full h-full object-cover" />
               </div>
             ) : (
-              <div className="text-3xl mb-2">📸</div>
+              <div className="text-3xl mb-2">[Camera]</div>
             )}
             <h3 className="font-lilita text-sm text-dark mb-1">{foodPic ? 'Photo added!' : 'Food photo'}</h3>
             <p className="text-xs font-bold text-dark/45">
-              {foodPic ? 'tap to remove' : 'optional — tap to add'}
+              {foodPic ? 'tap to remove' : 'optional - tap to add'}
             </p>
           </Card>
           <Card className={`text-center cursor-pointer transition-all ${selfie ? 'bg-green border-solid' : 'border-dashed hover:bg-yellow'}`}
@@ -320,7 +328,7 @@ export default function CookingSession() {
                 <img src={URL.createObjectURL(selfie)} alt="Selfie" className="w-full h-full object-cover" />
               </div>
             ) : (
-              <div className="text-3xl mb-2">🤳</div>
+              <div className="text-3xl mb-2">[Selfie]</div>
             )}
             <h3 className="font-lilita text-sm text-dark mb-1">{selfie ? 'Selfie added!' : 'Your selfie'}</h3>
             <p className="text-xs font-bold text-dark/45">
@@ -329,8 +337,8 @@ export default function CookingSession() {
           </Card>
         </div>
 
-        <Button fullWidth onClick={getScore} className="mb-2.5">
-          <span className="emoji-trophy"></span> Get my score! →
+        <Button fullWidth onClick={getScore} isLoading={isGettingScore} className="mb-2.5">
+          <span className="emoji-trophy"></span> Get my score! {'>'}
         </Button>
         <div className="text-center">
           <button
@@ -447,13 +455,13 @@ export default function CookingSession() {
 
           {/* Action Buttons */}
           <div className="flex flex-col sm:flex-row gap-3 mt-4 mx-1">
-            <button 
+            <Button 
               onClick={handlePublish} 
-              disabled={isPublishing} 
-              className="flex-1 bg-[#ED5B97] hover:bg-[#D94A84] text-white font-lilita text-lg tracking-wide rounded-[30px] p-4 transition-all shadow-sm disabled:opacity-50 flex items-center justify-center gap-2 border-[2.5px] border-transparent cursor-pointer"
+              isLoading={isPublishing} 
+              className="flex-1 !bg-[#ED5B97] !hover:bg-[#D94A84] !text-white !font-lilita !text-lg !tracking-wide !rounded-[30px] !p-4 !shadow-sm !flex !items-center !justify-center !gap-2 !border-[2.5px] !border-transparent !cursor-pointer"
             >
-              {isPublishing ? 'Sharing...' : <>Share to Community 🌍</>}
-            </button>
+              Share to Community
+            </Button>
             <button 
               onClick={resetApp} 
               className="flex-1 bg-[#241000] hover:bg-[#1A0A00] text-white rounded-[30px] p-2.5 transition-all flex flex-col items-center justify-center border-[2.5px] border-transparent cursor-pointer"
@@ -567,7 +575,7 @@ export default function CookingSession() {
         >
           {chatOpen ? '✕ close chat' : '💬 Ask Mumma'}
         </Button>
-        <Button onClick={markStepDone}>
+        <Button onClick={markStepDone} isLoading={isMarkingDone}>
           {currentStep >= session.steps.length - 1 ? <>All done! 🥳</> : 'Done! Next →'}
         </Button>
       </div>
@@ -621,12 +629,13 @@ export default function CookingSession() {
               onChange={(e) => setInputMessage(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && sendMessage()}
             />
-            <button
-              className="bg-pink border-[2.5px] border-dark rounded-[10px] w-10 h-10 flex items-center justify-center cursor-pointer text-lg shadow-custom-small flex-shrink-0 hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-custom-small-hover transition-all"
+            <Button
+              className="!w-10 !h-10 !p-0 !min-h-0 !flex !items-center !justify-center !text-lg !shadow-custom-small !flex-shrink-0"
               onClick={sendMessage}
+              isLoading={isWaitingMom}
             >
               ↑
-            </button>
+            </Button>
           </div>
         </Card>
       )}

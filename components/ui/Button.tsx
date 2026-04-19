@@ -4,6 +4,8 @@ interface ButtonProps {
   children: React.ReactNode;
   variant?: 'primary' | 'secondary';
   disabled?: boolean;
+  isLoading?: boolean;
+  loadingText?: string;
   onClick?: () => void;
   type?: 'button' | 'submit' | 'reset';
   className?: string;
@@ -14,6 +16,8 @@ export default function Button({
   children,
   variant = 'primary',
   disabled = false,
+  isLoading = false,
+  loadingText,
   onClick,
   type = 'button',
   className = '',
@@ -25,16 +29,28 @@ export default function Button({
 
   const responsiveClasses = 'btn-mobile';
   const widthClasses = fullWidth ? 'w-full' : '';
-  const disabledClasses = disabled ? 'opacity-50 cursor-not-allowed' : '';
+  const disabledClasses = (disabled || isLoading) ? 'opacity-80 cursor-not-allowed' : '';
+  const loadingClasses = isLoading ? 'btn-loading' : '';
 
   return (
     <button
       type={type}
-      onClick={onClick}
-      disabled={disabled}
-      className={`${baseClasses} ${responsiveClasses} ${widthClasses} ${disabledClasses} ${className}`}
+      onClick={isLoading ? undefined : onClick}
+      disabled={disabled || isLoading}
+      className={`${baseClasses} ${responsiveClasses} ${widthClasses} ${disabledClasses} ${loadingClasses} ${className}`}
     >
-      {children}
+      <div className="flex items-center justify-center gap-2">
+        {isLoading ? (
+          <>
+            {loadingText || children}
+            <span className="flex gap-1 ml-1">
+              <span className="w-1.5 h-1.5 bg-current rounded-full animate-bounce [animation-delay:-0.3s]"></span>
+              <span className="w-1.5 h-1.5 bg-current rounded-full animate-bounce [animation-delay:-0.15s]"></span>
+              <span className="w-1.5 h-1.5 bg-current rounded-full animate-bounce"></span>
+            </span>
+          </>
+        ) : children}
+      </div>
     </button>
   );
 }
