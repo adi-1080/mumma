@@ -27,7 +27,7 @@ export default function Navbar() {
             <AppLogo className="w-full h-full object-cover" />
           </div>
           <span className="mt-1 desktop-only">Mumma's Kitchen</span>
-          <span className="mt-1 mobile-only">Mumma's</span>
+          <span className="mt-1 mobile-only text-base whitespace-nowrap">Mumma's Kitchen</span>
         </Link>
         <div className="flex gap-1 bg-white/10 rounded-[20px] p-1 mobile-hidden ml-4">
           <Link href="/" className={`np block text-center ${getActiveClass('/')}`}>
