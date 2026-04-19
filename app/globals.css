@@ -653,12 +653,14 @@ body {
   border: 2.5px solid #1A0A00;
   border-radius: 16px;
   box-shadow: 4px 4px 0 #1A0A00;
-  transition: all 0.15s;
+  transition: all 0.1s ease-out;
   font-family: 'Lilita One', cursive;
   font-size: 17px;
   padding: 13px 24px;
   display: inline-block;
   text-align: center;
+  position: relative;
+  overflow: hidden;
 }
 
 .btn-primary:hover:not(:disabled) {
@@ -666,12 +668,13 @@ body {
   box-shadow: 6px 6px 0 #1A0A00;
 }
 
-.btn-primary:active:not(:disabled) {
+.btn-primary:active:not(:disabled), .btn-primary.btn-loading {
+  background-color: #E03D70;
   transform: translate(2px, 2px);
   box-shadow: 2px 2px 0 #1A0A00;
 }
 
-.btn-primary:disabled {
+.btn-primary:disabled:not(.btn-loading) {
   background-color: rgba(0, 0, 0, 0.12);
   color: rgba(0, 0, 0, 0.3);
   box-shadow: none;
@@ -685,7 +688,7 @@ body {
   border: 2px solid #1A0A00;
   border-radius: 10px;
   box-shadow: 2px 2px 0 #1A0A00;
-  transition: all 0.15s;
+  transition: all 0.1s ease-out;
   font-family: 'Nunito', sans-serif;
   font-size: 13px;
   font-weight: 800;
@@ -696,6 +699,12 @@ body {
 .btn-secondary:hover:not(:disabled) {
   transform: translate(-1px, -1px);
   box-shadow: 3px 3px 0 #1A0A00;
+}
+
+.btn-secondary:active:not(:disabled), .btn-secondary.btn-loading {
+  background-color: #F5F5F5;
+  transform: translate(1px, 1px);
+  box-shadow: 1px 1px 0 #1A0A00;
 }
 
 .card-primary {

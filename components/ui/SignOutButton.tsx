@@ -1,21 +1,33 @@
 'use client';
 
+import { useState } from 'react';
 import { authClient } from '@/lib/auth-client';
+import Button from './Button';
 
 interface SignOutButtonProps {
     className?: string;
 }
 
 export function SignOutButton({ className = "" }: SignOutButtonProps) {
+    const [isLoading, setIsLoading] = useState(false);
+
     return (
-        <button
+        <Button
+            variant="secondary"
+            isLoading={isLoading}
             onClick={async () => {
-                await authClient.signOut();
-                window.location.pathname = '/';
+                setIsLoading(true);
+                try {
+                    await authClient.signOut();
+                    window.location.href = '/';
+                } catch (error) {
+                    console.error('Sign out failed:', error);
+                    setIsLoading(false);
+                }
             }}
-            className={`px-4 py-2 text-sm font-bold text-red-600 bg-red-50 hover:bg-red-100 border-2 border-red-200 rounded-[10px] transition-colors ${className}`}
+            className={`!text-red-500 !bg-red-50 !border-red-200 hover:!bg-red-100 ${className}`}
         >
             Sign Out
-        </button>
+        </Button>
     );
 }

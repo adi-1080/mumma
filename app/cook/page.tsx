@@ -71,6 +71,7 @@ export default function IngredientPicker() {
     }
   };
 
+  // Full page loader only for session check, for startCooking we use button loading
   if (isPending) {
     return (
       <div className="main-container flex items-center justify-center min-h-[600px]">
@@ -97,22 +98,6 @@ export default function IngredientPicker() {
             Log In or Sign Up
           </Button>
         </Link>
-      </div>
-    );
-  }
-
-  if (isLoading) {
-    return (
-      <div className="main-container flex items-center justify-center min-h-[600px]">
-        <div className="text-center">
-          <div className="w-[80px] h-[80px] rounded-full mx-auto mb-4 bounce-slow border-[3px] border-dark overflow-hidden bg-white shadow-custom-small"><AppLogo className="w-full h-full object-cover" /></div>
-          <h2 className="font-lilita text-2xl text-dark mb-2">
-            Mumma's thinking<span className="dot-1">.</span><span className="dot-2">.</span><span className="dot-3">.</span>
-          </h2>
-          <p className="text-sm font-bold text-dark/50">
-            Finding the perfect recipe for what you have <span className="emoji-plate"></span>
-          </p>
-        </div>
       </div>
     );
   }
@@ -203,9 +188,11 @@ export default function IngredientPicker() {
       <Button 
         fullWidth 
         onClick={startCooking}
-        disabled={!ingredients.length || isLoading}
+        isLoading={isLoading}
+        loadingText="Mumma's thinking (est. 20s)"
+        disabled={!ingredients.length}
       >
-        <span dangerouslySetInnerHTML={{ __html: !ingredients.length ? 'add ingredients first [up]' : 'Let Mumma decide! [right]' }} />
+        <span dangerouslySetInnerHTML={{ __html: !ingredients.length ? 'add ingredients first' : 'Let Mumma decide!' }} />
       </Button>
     </div>
   );
