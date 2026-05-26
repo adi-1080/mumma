@@ -21,6 +21,9 @@ export async function GET() {
         username: true,
         bio: true,
         image: true,
+        plan: true,
+        ttsCharacterLimit: true,
+        ttsCharactersUsed: true,
         createdAt: true 
       },
     })

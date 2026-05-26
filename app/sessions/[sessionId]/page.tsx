@@ -6,6 +6,8 @@ import Button from '@/components/ui/Button';
 import Card from '@/components/ui/Card';
 import AppLogo from '@/components/ui/AppLogo';
 import { PosterGenerator } from '@/components/ui/PosterGenerator';
+import Timer from '@/components/cooking/Timer';
+import VoiceCall from '@/components/cooking/VoiceCall';
 
 interface Step {
   id: string;
@@ -38,6 +40,7 @@ export default function CookingSession() {
   const [currentStep, setCurrentStep] = useState(0);
   const [messages, setMessages] = useState<Message[]>([]);
   const [chatOpen, setChatOpen] = useState(false);
+  const [voiceCallOpen, setVoiceCallOpen] = useState(false);
   const [inputMessage, setInputMessage] = useState('');
   const [isWaitingMom, setIsWaitingMom] = useState(false);
   const [showAllStepsModal, setShowAllStepsModal] = useState(false);
@@ -567,15 +570,27 @@ export default function CookingSession() {
         </p>
       </Card>
 
-      <div className="flex gap-2.5 mb-3">
+      {/* Timer */}
+      <div className="mb-3">
+        <Timer />
+      </div>
+
+      <div className="flex gap-2 mb-3 flex-wrap">
         <Button
           variant="secondary"
           className="flex-1"
-          onClick={() => setChatOpen(!chatOpen)}
+          onClick={() => { setChatOpen(!chatOpen); if (!chatOpen) setVoiceCallOpen(false); }}
         >
           {chatOpen ? '✕ close chat' : '💬 Ask Mumma'}
         </Button>
-        <Button onClick={markStepDone} isLoading={isMarkingDone}>
+        <Button
+          variant="secondary"
+          className="flex-1"
+          onClick={() => { setVoiceCallOpen(true); setChatOpen(false); }}
+        >
+          🎙️ Call Mumma
+        </Button>
+        <Button onClick={markStepDone} isLoading={isMarkingDone} className="flex-1">
           {currentStep >= session.steps.length - 1 ? <>All done! 🥳</> : 'Done! Next →'}
         </Button>
       </div>
@@ -638,6 +653,15 @@ export default function CookingSession() {
             </Button>
           </div>
         </Card>
+      )}
+
+      {/* Voice Call Overlay */}
+      {voiceCallOpen && (
+        <VoiceCall
+          stepId={currentStepData.id}
+          stepTitle={currentStepData.title}
+          onClose={() => setVoiceCallOpen(false)}
+        />
       )}
 
       {/* Modal for All Steps */}
