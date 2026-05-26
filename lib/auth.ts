@@ -9,13 +9,6 @@ export const auth = betterAuth({
         provider: "postgresql",
     }),
     databaseHooks: {
-        user: {
-            create: {
-                after: async (user) => {
-                    await sendWelcomeEmail(user.email, user.name || "beta");
-                }
-            }
-        },
         verification: {
             create: {
                 before: async (verification) => {
@@ -35,11 +28,7 @@ export const auth = betterAuth({
         },
     },
     emailVerification: {
-        sendOnSignUp: true,
         autoSignInAfterVerification: true,
-        sendVerificationEmail: async ({ user, url, token }, request) => {
-            await sendVerificationEmail(user.email, user.name || "beta", url, token);
-        },
     },
     socialProviders: {
         google: {

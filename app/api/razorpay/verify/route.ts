@@ -4,6 +4,8 @@ import { prisma } from "@/lib/prisma"
 import { getAuthUserId } from "@/lib/auth-session"
 import { ok, err } from "@/lib/api-response"
 
+import { getRazorpay } from "@/lib/razorpay"
+
 export async function POST(request: NextRequest) {
   try {
     // 1. Authenticate
@@ -64,7 +66,18 @@ export async function POST(request: NextRequest) {
       return ok({ success: true, plan: "PRO", message: "Payment already verified." })
     }
 
-    // 5. Transaction: update Payment + upgrade User to PRO
+    // 5. Fetch payment details to retrieve customer_id if associated
+    let customerId: string | null = null
+    try {
+      const paymentDetails = await getRazorpay().payments.fetch(razorpay_payment_id)
+      if (paymentDetails && typeof paymentDetails === "object") {
+        customerId = (paymentDetails.customer_id as string) || null
+      }
+    } catch (fetchErr) {
+      console.warn("Failed to fetch payment details from Razorpay:", fetchErr)
+    }
+
+    // 6. Transaction: update Payment + upgrade User to PRO
     await prisma.$transaction([
       prisma.payment.update({
         where: { razorpayOrderId: razorpay_order_id },
@@ -79,6 +92,7 @@ export async function POST(request: NextRequest) {
         data: {
           plan: "PRO",
           ttsCharacterLimit: 50000,
+          razorpayCustomerId: customerId,
         },
       }),
     ])

@@ -209,7 +209,8 @@ body {
   }
   
   body {
-    padding: 1rem;
+    padding: 0;
+    padding-bottom: 76px;
     overflow-x: hidden;
   }
   

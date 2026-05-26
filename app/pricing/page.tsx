@@ -19,18 +19,24 @@ interface UserPlan {
 }
 
 const FREE_FEATURES = [
-  { emoji: '🎙️', text: '10,000 Voice Characters' },
-  { emoji: '📖', text: 'Basic Recipes' },
-  { emoji: '👨‍👩‍👧', text: 'Community Access' },
-  { emoji: '💬', text: 'Text Chat with Mumma' },
+  { text: '10,000 Voice Characters Limit' },
+  { text: 'Basic Recipes Only' },
+  { text: 'Community Access' },
+  { text: 'Standard Text Chat Only' },
 ];
 
 const PRO_FEATURES = [
-  { emoji: '🎙️', text: '50,000 Voice Characters/mo' },
-  { emoji: '⚡', text: 'Priority AI Mom Chat' },
-  { emoji: '📖', text: 'Unlimited Recipes' },
-  { emoji: '👨‍👩‍👧', text: 'Community Access' },
-  { emoji: '💖', text: 'Support Mumma\'s Kitchen' },
+  { text: '50,000 Voice Characters/mo' },
+  { text: 'Continuous Voice Call Mode' },
+  { text: 'Priority Low-Latency AI Mom Response' },
+  { text: 'Support Mumma\'s Kitchen' },
+];
+
+const LIMITATIONS = [
+  { text: 'Voice characters cap at 10,000 (No monthly refills)' },
+  { text: 'No live conversational voice call overlays' },
+  { text: 'Limited recipe access (Basic catalog only)' },
+  { text: 'Standard processing speed (Longer wait times)' },
 ];
 
 function loadRazorpayScript(): Promise<boolean> {
@@ -47,7 +53,7 @@ function loadRazorpayScript(): Promise<boolean> {
   });
 }
 
-export default function PricingPage() {
+export default function BillingPage() {
   const { data: session } = authClient.useSession();
   const [userPlan, setUserPlan] = useState<UserPlan | null>(null);
   const [isUpgrading, setIsUpgrading] = useState(false);
@@ -65,8 +71,6 @@ export default function PricingPage() {
     fetch('/api/user/profile')
       .then((res) => res.json())
       .then((data) => {
-        // The profile may not return plan, so we also check from a dedicated endpoint
-        // For now we'll fetch the plan from the user data
         setUserPlan({
           plan: data.user?.plan || 'FREE',
           ttsCharacterLimit: data.user?.ttsCharacterLimit ?? 10000,
@@ -177,43 +181,42 @@ export default function PricingPage() {
   }, [session, userPlan]);
 
   return (
-    <div className="main-container fade-up container-mobile pb-8">
+    <div className="main-container fade-up container-mobile pb-12">
       {/* Header */}
-      <div className="text-center mb-6">
+      <div className="text-center mb-8">
         <div className="text-xs font-extrabold bg-dark text-yellow rounded-[20px] px-3.5 py-1.5 inline-flex items-center justify-center gap-1.5 mb-3.5 tracking-wider">
           <div className="w-4 h-4 rounded-[4px] overflow-hidden bg-white">
             <AppLogo className="w-full h-full object-cover" />
           </div>
-          PRICING
+          BILLING & PRICING
         </div>
         <h1 className="font-lilita text-4xl text-dark mb-2 heading-responsive">
-          Cook with <span className="text-pink">Mumma</span>
+          Upgrade to <span className="text-pink">Pro Plan</span>
         </h1>
         <p className="text-sm font-bold text-dark/60 max-w-md mx-auto">
-          Start free, upgrade when you want Mumma to talk to you with her voice 🎙️
+          Get complete hands-free voice calling access and unlock premium Desi Mom recipes!
         </p>
       </div>
 
       {/* Success Banner */}
       {success && (
-        <div className="bg-green border-[2.5px] border-dark rounded-[18px] p-4 mb-5 text-center shadow-custom fade-up">
-          <div className="text-3xl mb-2">🎉</div>
+        <div className="bg-green border-[2.5px] border-dark rounded-[18px] p-4 mb-6 text-center shadow-custom fade-up">
           <h3 className="font-lilita text-xl text-dark mb-1">Welcome to Pro!</h3>
           <p className="text-sm font-bold text-dark/60">
-            You now have 50,000 voice characters. Mumma is so happy! 💖
+            You now have 50,000 voice characters. Mumma is so happy!
           </p>
         </div>
       )}
 
       {/* Error Banner */}
       {error && (
-        <div className="bg-pink/10 border-2 border-pink rounded-[14px] p-3 mb-5 text-center">
+        <div className="bg-pink/10 border-2 border-pink rounded-[14px] p-3 mb-6 text-center">
           <p className="text-sm font-bold text-dark">{error}</p>
         </div>
       )}
 
-      {/* Plans Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+      {/* Plans Side-by-Side */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-8">
         {/* Free Plan */}
         <Card className={`bg-green relative ${isPro ? 'opacity-70' : ''}`}>
           {!isPro && !loadingPlan && session && (
@@ -222,16 +225,15 @@ export default function PricingPage() {
             </span>
           )}
           <div className="pt-2">
-            <h2 className="font-lilita text-2xl text-dark mb-1">Free</h2>
+            <h2 className="font-lilita text-2xl text-dark mb-1">Free Tier</h2>
             <div className="flex items-baseline gap-1 mb-4">
               <span className="font-lilita text-4xl text-dark">₹0</span>
               <span className="text-sm font-bold text-dark/50">/forever</span>
             </div>
 
-            <div className="space-y-2.5 mb-5">
+            <div className="space-y-2.5 mb-6">
               {FREE_FEATURES.map((f, i) => (
                 <div key={i} className="flex items-center gap-2.5">
-                  <span className="text-base">{f.emoji}</span>
                   <span className="text-sm font-bold text-dark">{f.text}</span>
                 </div>
               ))}
@@ -250,25 +252,24 @@ export default function PricingPage() {
         <Card className={`bg-yellow relative ${isPro ? 'ring-4 ring-pink ring-offset-2' : ''}`}>
           {isPro && !loadingPlan && (
             <span className="absolute -top-3 left-4 bg-pink text-white text-xs font-extrabold px-3 py-1 rounded-full border-2 border-dark">
-              ✨ Your Plan
+              Active Plan
             </span>
           )}
           {!isPro && (
-            <span className="absolute -top-3 right-4 bg-pink text-white text-xs font-extrabold px-3 py-1 rounded-full border-2 border-dark">
-              Popular ✨
+            <span className="absolute -top-3 right-4 bg-pink text-white text-xs font-extrabold px-3 py-1 rounded-full border-2 border-dark animate-pulse">
+              Recommended
             </span>
           )}
           <div className="pt-2">
-            <h2 className="font-lilita text-2xl text-dark mb-1">Pro</h2>
+            <h2 className="font-lilita text-2xl text-dark mb-1">Pro Plan</h2>
             <div className="flex items-baseline gap-1 mb-4">
               <span className="font-lilita text-4xl text-dark">₹199</span>
               <span className="text-sm font-bold text-dark/50">/month</span>
             </div>
 
-            <div className="space-y-2.5 mb-5">
+            <div className="space-y-2.5 mb-6">
               {PRO_FEATURES.map((f, i) => (
                 <div key={i} className="flex items-center gap-2.5">
-                  <span className="text-base">{f.emoji}</span>
                   <span className="text-sm font-bold text-dark">{f.text}</span>
                 </div>
               ))}
@@ -279,7 +280,7 @@ export default function PricingPage() {
                 disabled
                 className="w-full bg-dark text-yellow border-2 border-dark rounded-[14px] py-3 font-lilita text-base cursor-default"
               >
-                ✅ Active
+                Active
               </button>
             ) : (
               <Button
@@ -289,9 +290,37 @@ export default function PricingPage() {
                 loadingText="Processing..."
                 className="!rounded-[14px] !py-3 !text-base"
               >
-                {session ? '✨ Upgrade to Pro' : '🔐 Sign in to Upgrade'}
+                {session ? 'Upgrade to Pro' : 'Sign in to Upgrade'}
               </Button>
             )}
+          </div>
+        </Card>
+      </div>
+
+      {/* Limitations of Free Plan Detail Section */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-8">
+        <Card className="bg-orange/40">
+          <h3 className="font-lilita text-lg text-dark mb-3 flex items-center gap-2">
+            Limitations of Free Plan
+          </h3>
+          <ul className="space-y-2">
+            {LIMITATIONS.map((lim, i) => (
+              <li key={i} className="flex items-start gap-2.5 text-sm font-bold text-dark/70">
+                <span className="text-pink">x</span>
+                <span>{lim.text}</span>
+              </li>
+            ))}
+          </ul>
+        </Card>
+
+        {/* Benefits of Pro Plan Detail Section */}
+        <Card className="bg-blue/30">
+          <h3 className="font-lilita text-lg text-dark mb-3">
+            Why go Pro?
+          </h3>
+          <div className="space-y-2 text-sm font-bold text-dark/80">
+            <div>• Real-time conversations</div>
+            <div>• Higher TTS limits</div>
           </div>
         </Card>
       </div>

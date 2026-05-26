@@ -17,6 +17,7 @@ function VerifyEmailContent() {
   const [loading, setLoading] = useState(false);
   const [resendLoading, setResendLoading] = useState(false);
   const [emailInput, setEmailInput] = useState('');
+  const [resendSuccess, setResendSuccess] = useState('');
 
   // Check if token is in URL (from email link)
   useEffect(() => {
@@ -49,6 +50,12 @@ function VerifyEmailContent() {
         setError(res.error.message || 'Verification failed. Please try again.');
       } else {
         setSuccess('Email verified successfully! Redirecting you to cook...');
+        // Trigger the Welcome email now that verification has completed successfully!
+        try {
+          await fetch('/api/auth/send-welcome', { method: 'POST' });
+        } catch (e) {
+          console.error("Failed to send welcome email:", e);
+        }
         setTimeout(() => router.push('/cook'), 2000);
       }
     } catch (err: any) {
@@ -75,6 +82,7 @@ function VerifyEmailContent() {
     }
     setResendLoading(true);
     setError('');
+    setResendSuccess('');
     try {
       const res = await authClient.emailOtp.sendVerificationOtp({
         email: emailInput.trim().toLowerCase(),
@@ -83,7 +91,9 @@ function VerifyEmailContent() {
       if (res.error) {
         setError(res.error.message || 'Failed to resend verification email');
       } else {
-        setSuccess('Verification email with a 6-digit code has been sent! Please check your inbox.');
+        setResendSuccess('Verification email with a 6-digit code has been sent! Please check your inbox.');
+        // Auto-clear notification after 6 seconds
+        setTimeout(() => setResendSuccess(''), 6000);
       }
     } catch (err: any) {
       setError(err?.message || 'Failed to resend verification email');
@@ -115,6 +125,11 @@ function VerifyEmailContent() {
           </div>
         ) : (
           <>
+            {resendSuccess && (
+              <div className="bg-green/30 border-2 border-green text-dark rounded-[14px] p-3 mb-4 text-sm font-bold text-center">
+                {resendSuccess}
+              </div>
+            )}
             {/* Verify with OTP */}
             <form onSubmit={verifyWithOtp} className="card-primary mb-4">
               <h2 className="font-lilita text-xl text-dark mb-4">Enter Verification Code</h2>

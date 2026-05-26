@@ -49,9 +49,20 @@ export default function LoginPage() {
           const errorMessage = res.error.message?.toLowerCase() || '';
           
           if (errorMessage.includes('not verified') || errorMessage.includes('verify') || errorMessage.includes('verification')) {
-            setError('Please verify your email first. Redirecting to verification page...');
+            setError('Please verify your email first. Mumma is sending a verification code...');
+            
+            // Auto-trigger a new verification OTP code for this user!
+            try {
+              await authClient.emailOtp.sendVerificationOtp({
+                email: email.trim().toLowerCase(),
+                type: 'email-verification'
+              });
+            } catch (otpErr) {
+              console.error("Failed to auto-send OTP on login block:", otpErr);
+            }
+
             setTimeout(() => {
-              window.location.href = '/verify-email';
+              window.location.href = `/verify-email?email=${encodeURIComponent(email)}`;
             }, 2000);
           } else if (errorMessage.includes('invalid') || errorMessage.includes('credentials')) {
             setError('Invalid email or password. Please check your credentials and try again.');
@@ -85,10 +96,10 @@ export default function LoginPage() {
             setError(res.error.message || 'Sign up failed. Please try again.');
           }
         } else {
-          setSuccessMessage("Account created successfully! Check your inbox for a welcome message from Mumma! Redirecting...");
+          setSuccessMessage("Account created successfully! Mumma sent a 6-digit verification code to your email. Redirecting to verification page...");
           setTimeout(() => {
-            window.location.href = '/cook';
-          }, 3000);
+            window.location.href = `/verify-email?email=${encodeURIComponent(email)}`;
+          }, 2500);
         }
       }
     } catch (err: any) {

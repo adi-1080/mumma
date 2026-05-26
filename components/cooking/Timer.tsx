@@ -117,7 +117,6 @@ export default function Timer() {
   return (
     <Card className={`${hasFinished ? 'bg-pink/10' : 'bg-orange'} transition-colors`}>
       <div className="flex items-center gap-2 mb-3">
-        <span className="text-lg">⏱️</span>
         <h3 className="font-lilita text-base text-dark">Timer</h3>
         {hasFinished && (
           <span className="bg-pink text-white text-xs font-extrabold px-2.5 py-0.5 rounded-full ml-auto border-2 border-dark">
@@ -182,7 +181,7 @@ export default function Timer() {
           onClick={toggleRunning}
           disabled={remaining <= 0 && !hasFinished}
         >
-          {isRunning ? '⏸ Pause' : remaining < totalSeconds && remaining > 0 ? '▶ Resume' : '▶ Start'}
+          {isRunning ? 'Pause' : remaining < totalSeconds && remaining > 0 ? 'Resume' : 'Start'}
         </Button>
         <Button
           variant="secondary"
@@ -190,7 +189,7 @@ export default function Timer() {
           onClick={reset}
           disabled={totalSeconds <= 0}
         >
-          ↺ Reset
+          Reset
         </Button>
       </div>
     </Card>

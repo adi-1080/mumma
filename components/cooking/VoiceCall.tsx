@@ -9,14 +9,15 @@ interface VoiceCallProps {
   stepId: string;
   stepTitle: string;
   onClose: () => void;
+  initialQuotaExceeded?: boolean;
 }
 
-export default function VoiceCall({ stepId, stepTitle, onClose }: VoiceCallProps) {
+export default function VoiceCall({ stepId, stepTitle, onClose, initialQuotaExceeded }: VoiceCallProps) {
   const [callState, setCallState] = useState<'connecting' | 'listening' | 'thinking' | 'speaking' | 'muted' | 'ended'>('connecting');
   const [duration, setDuration] = useState(0);
   const [userTranscript, setUserTranscript] = useState('');
   const [momReply, setMomReply] = useState('');
-  const [quotaExceeded, setQuotaExceeded] = useState(false);
+  const [quotaExceeded, setQuotaExceeded] = useState(initialQuotaExceeded || false);
   const [error, setError] = useState<string | null>(null);
 
   const recognitionRef = useRef<any>(null);
@@ -26,6 +27,7 @@ export default function VoiceCall({ stepId, stepTitle, onClose }: VoiceCallProps
 
   // 1. Duration counter
   useEffect(() => {
+    if (initialQuotaExceeded) return;
     durationIntervalRef.current = setInterval(() => {
       setDuration((prev) => prev + 1);
     }, 1000);
@@ -33,7 +35,7 @@ export default function VoiceCall({ stepId, stepTitle, onClose }: VoiceCallProps
     return () => {
       if (durationIntervalRef.current) clearInterval(durationIntervalRef.current);
     };
-  }, []);
+  }, [initialQuotaExceeded]);
 
   // Format call duration MM:SS
   const formatDuration = (secs: number) => {
@@ -44,6 +46,10 @@ export default function VoiceCall({ stepId, stepTitle, onClose }: VoiceCallProps
 
   // 2. Initialize Speech Recognition
   useEffect(() => {
+    if (initialQuotaExceeded) {
+      setCallState('ended');
+      return;
+    }
     const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
     if (!SpeechRecognition) {
       setError('Web Speech API is not supported in this browser. Please use Chrome/Safari.');
@@ -255,7 +261,7 @@ export default function VoiceCall({ stepId, stepTitle, onClose }: VoiceCallProps
             {callState === 'connecting' && 'Connecting...'}
             {callState === 'listening' && 'Listening Beta...'}
             {callState === 'thinking' && 'Mumma listening...'}
-            {callState === 'speaking' && 'Mumma Speaking... 🔊'}
+            {callState === 'speaking' && 'Mumma Speaking...'}
             {callState === 'muted' && 'Microphone Muted'}
             {callState === 'ended' && 'Call Ended'}
           </h1>
@@ -288,7 +294,6 @@ export default function VoiceCall({ stepId, stepTitle, onClose }: VoiceCallProps
       {/* Quota Banner */}
       {quotaExceeded && (
         <div className="fixed inset-0 bg-dark/95 flex flex-col items-center justify-center p-6 text-center z-[999999]">
-          <div className="text-6xl mb-4">🎙️</div>
           <h2 className="font-lilita text-2xl text-yellow mb-2">Voice Limits Reached!</h2>
           <p className="text-sm font-bold text-white/60 max-w-sm mb-6 leading-relaxed">
             Beta, you have run out of your voice call characters. Upgrade to Pro so we can continue talking!
@@ -296,7 +301,7 @@ export default function VoiceCall({ stepId, stepTitle, onClose }: VoiceCallProps
           <div className="flex flex-col gap-3 w-full max-w-xs">
             <Link href="/pricing" onClick={handleEndCall}>
               <Button fullWidth className="!bg-[#FF4D80]">
-                ✨ Upgrade to Pro
+                Upgrade to Pro
               </Button>
             </Link>
             <Button variant="secondary" fullWidth onClick={handleEndCall} className="!bg-white/10 !text-white !border-white/20">
@@ -312,18 +317,18 @@ export default function VoiceCall({ stepId, stepTitle, onClose }: VoiceCallProps
         <button
           onClick={toggleMute}
           disabled={callState === 'connecting'}
-          className={`w-14 h-14 rounded-full border-2 border-white/20 flex items-center justify-center transition-all cursor-pointer
+          className={`w-14 h-14 rounded-full border-2 border-white/20 flex items-center justify-center transition-all cursor-pointer font-bold
             ${callState === 'muted' ? 'bg-white text-dark border-white' : 'bg-white/10 hover:bg-white/20 text-white'}`}
         >
-          <span className="text-lg">{callState === 'muted' ? '🎙️' : '🔇'}</span>
+          {callState === 'muted' ? 'Talk' : 'Mute'}
         </button>
 
         {/* Hang Up Button */}
         <button
           onClick={handleEndCall}
-          className="w-20 h-20 rounded-full bg-pink hover:bg-pink/90 border-4 border-dark flex items-center justify-center transition-all shadow-xl hover:scale-105 active:scale-95 cursor-pointer"
+          className="w-20 h-20 rounded-full bg-pink hover:bg-pink/90 border-4 border-dark flex items-center justify-center transition-all shadow-xl hover:scale-105 active:scale-95 cursor-pointer font-lilita text-dark text-sm"
         >
-          <span className="text-2xl">🔴</span>
+          End
         </button>
       </div>
 
