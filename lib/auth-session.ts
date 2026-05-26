@@ -24,3 +24,33 @@ export async function requireAuth() {
   }
   return session.user.id
 }
+
+/**
+ * Non-throwing auth helper for API route handlers.
+ * Returns { userId } on success, or { error: Response } on failure.
+ */
+export async function getAuthUserId(): Promise<
+  { userId: string; error?: never } | { userId?: never; error: Response }
+> {
+  try {
+    const session = await auth.api.getSession({
+      headers: await headers(),
+    })
+    if (!session?.user?.id) {
+      return {
+        error: Response.json(
+          { error: "Unauthorized. Please sign in." },
+          { status: 401 }
+        ),
+      }
+    }
+    return { userId: session.user.id }
+  } catch {
+    return {
+      error: Response.json(
+        { error: "Unauthorized. Please sign in." },
+        { status: 401 }
+      ),
+    }
+  }
+}
