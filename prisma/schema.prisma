@@ -14,16 +14,51 @@ model User {
   image           String?
   username        String?          @unique
   bio             String?
+
+  //subscription & tts limits
+  plan SubscriptionPlan @default(FREE)
+  ttsCharacterLimit Int? @default(10000)
+  ttsCharactersUsed Int? @default(0)
+
+  //razorpay integration
+  razorpayCustomerId String? @unique
+  razorpaySubscriptionId String? @unique
+
   createdAt       DateTime         @default(now())
   updatedAt       DateTime         @updatedAt
+
+  //relations
   communityPosts  CommunityPost[]
   cookResults     CookResult[]
   cookingSessions CookingSession[]
   recipes        Recipe[]
   accounts        Account[]
   sessions        Session[]
+  payments Payment[]
 
   @@map("user")
+}
+
+model Payment {
+  id String @id @default(cuid())
+  userId String
+  razorpayOrderId String? @unique
+  razorpayPaymentId String? @unique
+  razorpaySignature String?
+
+  amount Int 
+  currency String? @default("INR")
+  status PaymentStatus @default(PENDING)
+  planPurchased SubscriptionPlan?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([razorpayOrderId])
+  @@map("payment")
 }
 
 model Session {
@@ -121,6 +156,10 @@ model StepChat {
   stepId    String
   role      ChatRole
   content   String
+
+  //new field
+  ttsCharsUsed Int? @default(0)
+
   createdAt DateTime    @default(now())
   step      CookingStep @relation(fields: [stepId], references: [id], onDelete: Cascade)
 
@@ -169,3 +208,16 @@ enum ChatRole {
   USER
   MOM
 }
+
+enum SubscriptionPlan {
+  FREE
+  PRO
+}
+
+enum PaymentStatus {
+  PENDING
+  SUCCESS
+  FAILED
+}
+
+
