@@ -126,6 +126,7 @@ model CookingSession {
   recipeName  String
   recipeDesc  String
   totalSteps  Int
+  servings    Int?
   status      SessionStatus @default(IN_PROGRESS)
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @updatedAt
@@ -177,6 +178,7 @@ model CookResult {
   publishedAt   DateTime?
   recipeName    String
   ingredients   Json
+  servings      Int?
   createdAt     DateTime       @default(now())
   communityPost CommunityPost?
   session       CookingSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)

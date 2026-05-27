@@ -17,6 +17,7 @@ interface Recipe {
   recipeName: string;
   recipeDesc: string;
   totalSteps: number;
+  servings?: number | null;
   createdAt: string;
   steps: RecipeStep[];
   result: {
@@ -115,6 +116,11 @@ export default function RecipeDetailPage() {
           <p className="text-xs font-bold text-dark/50 mt-0.5">
             by {recipe.user ? recipe.user.name : "Anonymous"} • {new Date(recipe.createdAt).toLocaleDateString()}
           </p>
+          <div className="flex flex-wrap items-center gap-2 mt-2">
+            <span className="bg-yellow border-2 border-dark rounded-[20px] px-3 py-0.5 text-xs font-bold text-dark shadow-custom-small">
+              Serves: {recipe.servings || 2} {(recipe.servings || 2) === 1 ? 'person' : 'people'}
+            </span>
+          </div>
         </div>
         <div className="flex items-center gap-2">
           {recipe.result && (
@@ -189,7 +195,7 @@ export default function RecipeDetailPage() {
 
       {/* Cook This Recipe Button */}
       <div className="text-center">
-        <Link href="/cook">
+        <Link href={`/cook?cloneSessionId=${recipe.id}`}>
           <Button className="px-8">
             Cook This Recipe →
           </Button>

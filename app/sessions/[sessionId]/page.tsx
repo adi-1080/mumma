@@ -23,6 +23,7 @@ interface Session {
   recipeDesc: string;
   totalSteps: number;
   status: string;
+  servings?: number | null;
   steps: Step[];
 }
 
@@ -502,7 +503,12 @@ export default function CookingSession() {
       <div className="flex items-center justify-between mb-3">
         <div>
           <div className="text-xs font-extrabold text-dark/45 tracking-wider uppercase">now cooking</div>
-          <h3 className="font-lilita text-xl text-dark">{session.recipeName}</h3>
+          <h3 className="font-lilita text-xl text-dark flex items-center gap-2 flex-wrap">
+            {session.recipeName}
+            <span className="bg-yellow border-[1.5px] border-dark rounded-[12px] px-2.5 py-0.5 text-[10px] font-extrabold text-dark shadow-custom-small">
+              Serves: {session.servings || 2}
+            </span>
+          </h3>
         </div>
         <div className="flex flex-col items-end gap-1">
           <span className="bg-yellow border-2 border-dark rounded-[20px] px-3 py-1 text-xs font-extrabold text-dark">

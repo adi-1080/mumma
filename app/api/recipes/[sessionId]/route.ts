@@ -61,6 +61,7 @@ export async function GET(
         totalSteps: session.totalSteps,
         status: session.status,
         ingredients: session.ingredients,
+        servings: session.servings,
         createdAt: session.createdAt,
         updatedAt: session.updatedAt,
         steps: session.steps,
