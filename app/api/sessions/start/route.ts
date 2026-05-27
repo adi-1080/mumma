@@ -6,27 +6,29 @@ import { ok, err } from "@/lib/api-response"
 import { StartSessionSchema } from "@/lib/validators/session"
 
 const SYSTEM_PROMPT = `You are a warm Indian mom who is an expert home cook.
-A child tells you what ingredients they have.
-Your job is to suggest the single best recipe they can make
-and break it into clear, simple numbered steps.
+A child tells you what ingredients they have and how many people they want to cook for.
+Your job is to suggest the single best recipe they can make.
+Ensure that all ingredient quantities, proportions, and measurements in the recipe description and steps are scaled specifically for that number of people.
+Break it into clear, simple numbered steps.
 Each step should be short, friendly, and doable by a beginner.
 Aim for 5 to 8 steps. Never more than 8.
 Return ONLY a raw JSON object. No markdown. No explanation.`
 
-async function callLLM(ingredients: string[], retry = false): Promise<{
+async function callLLM(ingredients: string[], servings: number = 2, retry = false): Promise<{
   recipeName: string
   recipeDesc: string
   steps: { stepNumber: number; title: string; instruction: string }[]
 } | null> {
   const userPrompt = `I have these ingredients: ${ingredients.join(", ")}.
-What is the best thing I can cook?
+I want to cook a delicious dish for exactly ${servings} ${servings === 1 ? 'person' : 'people'}.
+What is the best thing I can cook? Please adjust and specify the exact ingredient proportions, quantities, and steps scaled for exactly ${servings} ${servings === 1 ? 'person' : 'people'}.
 
 Return this exact JSON:
 {
   "recipeName": "short recipe name",
-  "recipeDesc": "one warm sentence describing this dish",
+  "recipeDesc": "one warm sentence describing this dish and stating the exact portion sizes/quantities for ${servings} ${servings === 1 ? 'person' : 'people'}",
   "steps": [
-    { "stepNumber": 1, "title": "short title", "instruction": "clear instruction" }
+    { "stepNumber": 1, "title": "short title", "instruction": "clear instruction with specific quantities scaled for ${servings} ${servings === 1 ? 'person' : 'people'}" }
   ]
 }${retry ? "\n\nReturn ONLY raw JSON, no text before or after." : ""}`
 
@@ -60,9 +62,9 @@ export async function POST(request: NextRequest) {
       return err("Invalid ingredients: array of 1-15 strings required", 400)
     }
 
-    const { ingredients } = parsed.data
-    let recipe = await callLLM(ingredients)
-    if (!recipe) recipe = await callLLM(ingredients, true)
+    const { ingredients, servings = 2 } = parsed.data
+    let recipe = await callLLM(ingredients, servings)
+    if (!recipe) recipe = await callLLM(ingredients, servings, true)
     if (!recipe) return err("recipe_generation_failed", 500)
 
     const userId = await getOptionalSession()
@@ -74,6 +76,7 @@ export async function POST(request: NextRequest) {
         recipeName: recipe.recipeName,
         recipeDesc: recipe.recipeDesc,
         totalSteps: recipe.steps.length,
+        servings,
         steps: {
           create: recipe.steps.map((s) => ({
             stepNumber: s.stepNumber,

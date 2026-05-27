@@ -1,7 +1,7 @@
 'use client';
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState, useEffect, Suspense } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import Button from '@/components/ui/Button';
 import { authClient } from '@/lib/auth-client';
@@ -13,13 +13,51 @@ const SUGGESTIONS = [
   'dal', 'bread', 'milk', 'butter', 'garlic', 'coriander'
 ];
 
-export default function IngredientPicker() {
+function IngredientPickerContent() {
   const [ingredients, setIngredients] = useState<string[]>([]);
   const [inputValue, setInputValue] = useState('');
+  const [servings, setServings] = useState(2);
   const [isLoading, setIsLoading] = useState(false);
+  const [isCloning, setIsCloning] = useState(false);
+  const [cloneError, setCloneError] = useState<string | null>(null);
+
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const cloneSessionId = searchParams.get('cloneSessionId');
   
   const { data: session, isPending } = authClient.useSession();
+
+  // Handle cloning community recipe when query param is present
+  useEffect(() => {
+    if (cloneSessionId && session) {
+      handleCloneRecipe(cloneSessionId);
+    }
+  }, [cloneSessionId, session]);
+
+  const handleCloneRecipe = async (id: string) => {
+    setIsCloning(true);
+    setCloneError(null);
+    try {
+      const response = await fetch('/api/sessions/clone', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ cloneSessionId: id }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to clone recipe');
+      }
+
+      const data = await response.json();
+      router.push(`/sessions/${data.session.id}`);
+    } catch (err) {
+      console.error('Error cloning recipe:', err);
+      setCloneError('Beta, mumma had trouble copying this recipe. You can try adding ingredients manually!');
+      setIsCloning(false);
+    }
+  };
 
   const addIngredient = (value: string) => {
     const trimmed = value.trim().replace(/,$/, '').trim();
@@ -54,7 +92,7 @@ export default function IngredientPicker() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ ingredients }),
+        body: JSON.stringify({ ingredients, servings }),
       });
 
       if (!response.ok) {
@@ -65,11 +103,25 @@ export default function IngredientPicker() {
       router.push(`/sessions/${data.session.id}`);
     } catch (error) {
       console.error('Error starting cooking session:', error);
-      // Handle error - show toast or alert
     } finally {
       setIsLoading(false);
     }
   };
+
+  // Full page loader for cloning state
+  if (isCloning) {
+    return (
+      <div className="main-container flex flex-col items-center justify-center min-h-[60vh] text-center fade-up px-4">
+        <div className="w-[80px] h-[80px] rounded-full mx-auto mb-4 bounce-slow border-[3px] border-dark overflow-hidden bg-white shadow-custom-small">
+          <AppLogo className="w-full h-full object-cover" />
+        </div>
+        <h2 className="font-lilita text-3xl text-dark mb-4">Beta, copying the recipe...</h2>
+        <p className="text-sm font-bold text-dark/60 mb-8 max-w-sm">
+          Mumma is copying the exact same steps and ingredients so you can cook it yourself! Just a moment...
+        </p>
+      </div>
+    );
+  }
 
   // Full page loader only for session check, for startCooking we use button loading
   if (isPending) {
@@ -93,7 +145,7 @@ export default function IngredientPicker() {
         <p className="text-sm font-bold text-dark/60 mb-8 max-w-sm">
           You need to sign in first so Mumma can save your delicious recipes and score to your kitchen book!
         </p>
-        <Link href="/login" className="w-full max-w-xs block mx-auto">
+        <Link href={`/login?callbackUrl=${encodeURIComponent(cloneSessionId ? `/cook?cloneSessionId=${cloneSessionId}` : '/cook')}`} className="w-full max-w-xs block mx-auto">
           <Button className="w-full">
             Log In or Sign Up
           </Button>
@@ -120,6 +172,13 @@ export default function IngredientPicker() {
           Beta, tell mumma what you have at home! Even just 2-3 things and she'll figure it out <span className="emoji-heart"></span>
         </div>
       </div>
+
+      {/* Clone Error Notification */}
+      {cloneError && (
+        <Card className="mb-4 bg-pink/10 border-[2.5px] border-dark text-dark p-3.5 text-sm font-bold rounded-[14px] shadow-custom-small">
+          {cloneError}
+        </Card>
+      )}
 
       {/* Ingredient Input */}
       <Card className="mb-3 card-mobile">
@@ -163,7 +222,7 @@ export default function IngredientPicker() {
       </Card>
 
       {/* Quick Add */}
-      <Card className="mb-4.5 card-mobile">
+      <Card className="mb-3 card-mobile">
         <div className="text-xs font-extrabold text-dark/45 tracking-wider uppercase mb-2.5">
           quick add
         </div>
@@ -184,6 +243,37 @@ export default function IngredientPicker() {
         </div>
       </Card>
 
+      {/* Servings Picker */}
+      <Card className="mb-4.5 card-mobile">
+        <div className="text-xs font-extrabold text-dark/45 tracking-wider uppercase mb-2.5">
+          how many people are eating?
+        </div>
+        <div className="flex items-center gap-4 flex-wrap">
+          <div className="flex items-center border-[2.5px] border-dark rounded-[18px] bg-white overflow-hidden shadow-custom-small">
+            <button
+              type="button"
+              onClick={() => setServings(Math.max(1, servings - 1))}
+              className="px-4 py-2 bg-cream hover:bg-yellow border-r-2 border-dark font-lilita text-lg text-dark transition-colors cursor-pointer select-none active:translate-y-0.5"
+            >
+              -
+            </button>
+            <span className="px-5 font-lilita text-base text-dark min-w-[110px] text-center select-none">
+              {servings} {servings === 1 ? 'person' : 'people'}
+            </span>
+            <button
+              type="button"
+              onClick={() => setServings(Math.min(20, servings + 1))}
+              className="px-4 py-2 bg-cream hover:bg-yellow border-l-2 border-dark font-lilita text-lg text-dark transition-colors cursor-pointer select-none active:translate-y-0.5"
+            >
+              +
+            </button>
+          </div>
+          <p className="text-xs font-bold text-dark/50 italic flex-1 min-w-[150px]">
+            Mumma will customize portions and quantities for this exact number of servings!
+          </p>
+        </div>
+      </Card>
+
       {/* Start Cooking Button */}
       <Button 
         fullWidth 
@@ -195,5 +285,20 @@ export default function IngredientPicker() {
         <span dangerouslySetInnerHTML={{ __html: !ingredients.length ? 'add ingredients first' : 'Let Mumma decide!' }} />
       </Button>
     </div>
+  );
+}
+
+export default function IngredientPicker() {
+  return (
+    <Suspense fallback={
+      <div className="main-container flex items-center justify-center min-h-[600px]">
+        <div className="text-center">
+          <div className="w-[80px] h-[80px] rounded-full mx-auto mb-4 bounce-slow border-[3px] border-dark overflow-hidden bg-white shadow-custom-small"><AppLogo className="w-full h-full object-cover" /></div>
+          <h2 className="font-lilita text-2xl text-dark mb-2">Just a sec, beta...</h2>
+        </div>
+      </div>
+    }>
+      <IngredientPickerContent />
+    </Suspense>
   );
 }

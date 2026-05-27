@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { authClient } from '@/lib/auth-client';
 import Button from '@/components/ui/Button';
 import AppLogo from '@/components/ui/AppLogo';
+import Link from 'next/link';
 
 export default function LoginPage() {
   const [isLogin, setIsLogin] = useState(true);
@@ -14,6 +15,7 @@ export default function LoginPage() {
   const [successMessage, setSuccessMessage] = useState('');
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -46,7 +48,23 @@ export default function LoginPage() {
           // Handle different types of authentication errors
           const errorMessage = res.error.message?.toLowerCase() || '';
           
-          if (errorMessage.includes('invalid') || errorMessage.includes('credentials')) {
+          if (errorMessage.includes('not verified') || errorMessage.includes('verify') || errorMessage.includes('verification')) {
+            setError('Please verify your email first. Mumma is sending a verification code...');
+            
+            // Auto-trigger a new verification OTP code for this user!
+            try {
+              await authClient.emailOtp.sendVerificationOtp({
+                email: email.trim().toLowerCase(),
+                type: 'email-verification'
+              });
+            } catch (otpErr) {
+              console.error("Failed to auto-send OTP on login block:", otpErr);
+            }
+
+            setTimeout(() => {
+              window.location.href = `/verify-email?email=${encodeURIComponent(email)}`;
+            }, 2000);
+          } else if (errorMessage.includes('invalid') || errorMessage.includes('credentials')) {
             setError('Invalid email or password. Please check your credentials and try again.');
           } else if (errorMessage.includes('database') || errorMessage.includes('connection')) {
             setError('Database connection error. Please try again in a moment.');
@@ -78,10 +96,10 @@ export default function LoginPage() {
             setError(res.error.message || 'Sign up failed. Please try again.');
           }
         } else {
-          setSuccessMessage("Account created successfully! Check your inbox for a welcome message from Mumma! Redirecting...");
+          setSuccessMessage("Account created successfully! Mumma sent a 6-digit verification code to your email. Redirecting to verification page...");
           setTimeout(() => {
-            window.location.href = '/cook';
-          }, 3000);
+            window.location.href = `/verify-email?email=${encodeURIComponent(email)}`;
+          }, 2500);
         }
       }
     } catch (err: any) {
@@ -150,15 +168,40 @@ export default function LoginPage() {
           </div>
           <div>
             <label className="text-xs font-extrabold text-dark tracking-wider mb-1 block uppercase">Password</label>
-            <input 
-              type="password" 
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full border-[2.5px] border-dark rounded-[12px] p-2.5 font-nunito text-sm font-bold bg-white outline-none focus:border-pink transition-colors"
-              placeholder="••••••••"
-              required
-            />
+            <div className="relative">
+              <input 
+                type={showPassword ? "text" : "password"} 
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="w-full border-[2.5px] border-dark rounded-[12px] p-2.5 pr-10 font-nunito text-sm font-bold bg-white outline-none focus:border-pink transition-colors"
+                placeholder="••••••••"
+                required
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-dark/40 hover:text-dark transition-colors focus:outline-none"
+              >
+                {showPassword ? (
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-4.5 h-4.5">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.815 7.815L21 21m-2.956-2.956l-2.64-2.64m-1.406-1.406a3 3 0 11-4.243-4.243m4.243 4.243L9.878 9.878" />
+                  </svg>
+                ) : (
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-4.5 h-4.5">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                  </svg>
+                )}
+              </button>
+            </div>
           </div>
+          {isLogin && (
+            <div className="text-right -mt-2">
+              <Link href="/forgot-password" className="text-xs font-bold text-dark/60 hover:text-pink transition-colors">
+                Forgot password?
+              </Link>
+            </div>
+          )}
           <Button fullWidth type="submit" isLoading={loading} className="mt-1">
             {isLogin ? 'Log In' : 'Sign Up'}
           </Button>

@@ -16,6 +16,7 @@ export default function Navbar() {
     if (path === '/cook' && pathname.startsWith('/cook')) return 'active';
     if (path === '/community' && pathname === '/community') return 'active';
     if (path === '/recipes' && pathname.startsWith('/recipes')) return 'active';
+    if (path === '/pricing' && pathname === '/pricing') return 'active';
     return '';
   };
 
@@ -42,13 +43,16 @@ export default function Navbar() {
           <Link href="/recipes" className={`np block text-center ${getActiveClass('/recipes')}`}>
             My Recipes
           </Link>
+          <Link href="/pricing" className={`np block text-center ${getActiveClass('/pricing')}`}>
+            Pricing
+          </Link>
         </div>
         <span className="mt-1 mobile-hidden"></span>
         <span className="mt-1 mobile-only"></span>
       </div>
       
       {session ? (
-        <div className="flex items-center gap-4 ml-auto">
+        <div className="flex items-center gap-3.5 ml-auto">
           <Link href="/profile" className="flex items-center hover:opacity-80 transition-opacity">
             <div className="w-8 h-8 rounded-full overflow-hidden border-2 border-dark flex-shrink-0 shadow-custom-small bg-white">
               {session.user?.image ? (
@@ -59,7 +63,7 @@ export default function Navbar() {
                 />
               ) : (
                 <div className="w-full h-full bg-yellow flex items-center justify-center text-sm">
-                  [Chef]
+                  Chef
                 </div>
               )}
             </div>

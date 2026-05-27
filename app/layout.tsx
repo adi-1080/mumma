@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Lilita_One, Nunito } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/ui/Navbar";
+import BottomNav from "@/components/ui/BottomNav";
 
 const lilita = Lilita_One({
   variable: "--font-lilita",
@@ -77,6 +78,7 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col bg-cream font-nunito text-dark">
         <Navbar />
         {children}
+        <BottomNav />
       </body>
     </html>
   );

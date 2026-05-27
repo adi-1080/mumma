@@ -62,6 +62,7 @@ export async function POST(
         selfieUrl,
         recipeName: session.recipeName,
         ingredients: session.ingredients as unknown as string[],
+        servings: session.servings,
       },
     })
 

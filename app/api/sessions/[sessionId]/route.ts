@@ -37,6 +37,7 @@ export async function GET(
         recipeDesc: session.recipeDesc,
         totalSteps: session.totalSteps,
         status: session.status,
+        servings: session.servings,
         steps: session.steps.map((s) => ({
           id: s.id,
           stepNumber: s.stepNumber,

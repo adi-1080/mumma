@@ -2,6 +2,7 @@ import { z } from "zod"
 
 export const StartSessionSchema = z.object({
   ingredients: z.array(z.string().min(1).max(40)).min(1).max(15),
+  servings: z.number().min(1).max(20).optional(),
 })
 
 export const StepChatSchema = z.object({

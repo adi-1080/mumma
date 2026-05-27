@@ -6,6 +6,8 @@ import Button from '@/components/ui/Button';
 import Card from '@/components/ui/Card';
 import AppLogo from '@/components/ui/AppLogo';
 import { PosterGenerator } from '@/components/ui/PosterGenerator';
+import Timer from '@/components/cooking/Timer';
+import VoiceCall from '@/components/cooking/VoiceCall';
 
 interface Step {
   id: string;
@@ -21,6 +23,7 @@ interface Session {
   recipeDesc: string;
   totalSteps: number;
   status: string;
+  servings?: number | null;
   steps: Step[];
 }
 
@@ -38,6 +41,7 @@ export default function CookingSession() {
   const [currentStep, setCurrentStep] = useState(0);
   const [messages, setMessages] = useState<Message[]>([]);
   const [chatOpen, setChatOpen] = useState(false);
+  const [voiceCallOpen, setVoiceCallOpen] = useState(false);
   const [inputMessage, setInputMessage] = useState('');
   const [isWaitingMom, setIsWaitingMom] = useState(false);
   const [showAllStepsModal, setShowAllStepsModal] = useState(false);
@@ -287,10 +291,9 @@ export default function CookingSession() {
     return (
       <div className="main-container fade-up">
         <div className="text-center py-2 pb-6">
-          <div className="text-5xl mb-2.5"><span className="emoji-party"></span></div>
           <h1 className="font-lilita text-4xl text-dark mb-1.5">You did it, beta!</h1>
           <p className="text-sm font-bold text-dark/60">
-            You just cooked {session.recipeName}! Mumma is so proud <span className="emoji-heart"></span>
+            You just cooked {session.recipeName}! Mumma is so proud
           </p>
         </div>
 
@@ -299,7 +302,7 @@ export default function CookingSession() {
             <AppLogo className="w-full h-full object-cover" />
           </div>
           <div className="bg-yellow border-[2.5px] border-dark rounded-[14px] rounded-tl-[4px] p-3.5 text-sm font-bold text-dark leading-relaxed flex-1">
-            Arre wah!! Upload a photo of what you made - and show mumma your happy face too! She'll give you a score <span className="emoji-trophy"></span>
+            Arre wah! Upload a photo of what you made - and show mumma your happy face too! She'll give you a score
           </div>
         </div>
 
@@ -338,7 +341,7 @@ export default function CookingSession() {
         </div>
 
         <Button fullWidth onClick={getScore} isLoading={isGettingScore} className="mb-2.5">
-          <span className="emoji-trophy"></span> Get my score! {'>'}
+          Get my score! {'>'}
         </Button>
         <div className="text-center">
           <button
@@ -355,10 +358,10 @@ export default function CookingSession() {
   // Show score screen
   if (score !== null) {
     const messages = {
-      7: "Good effort! Mumma's already planning your next lesson 😄",
-      8: "Arey wah! Quite good! Mumma is smiling so wide right now 🥰",
-      9: "THIS is amazing! Showing your photo to all the aunties 🎉",
-      10: "PERFECT SCORE!! Humara best chef! Mumma is literally crying happy tears right now!! 😭❤️"
+      7: "Good effort! Mumma's already planning your next lesson",
+      8: "Arey wah! Quite good! Mumma is smiling so wide right now",
+      9: "THIS is amazing! Showing your photo to all the aunties",
+      10: "PERFECT SCORE! Humara best chef! Mumma is literally crying happy tears right now!"
     };
 
     return (
@@ -373,14 +376,14 @@ export default function CookingSession() {
             </div>
             <div className="text-left pr-4">
               <div className="text-white font-lilita tracking-wide text-[17px] leading-tight">Mumma's Kitchen</div>
-              <div className="text-[#F5B827] text-[10px] font-bold uppercase tracking-wider">cooked with love ✨</div>
+              <div className="text-[#F5B827] text-[10px] font-bold uppercase tracking-wider">cooked with love</div>
             </div>
           </div>
 
           {/* Title Area */}
           <div className="text-center mb-6">
             <h2 className="font-lilita text-[32px] text-dark leading-none mb-1">
-              I Cooked It! 🍲
+              I Cooked It!
             </h2>
             <div className="text-[#ED5B97] font-bold text-sm tracking-wide">
               sharing my cooking adventure
@@ -405,7 +408,6 @@ export default function CookingSession() {
                 </div>
               ) : (
                 <div className="relative z-10 flex flex-col items-center justify-center h-full">
-                  <span className="text-4xl mb-2">🍲</span>
                   <span className="text-xs font-bold text-dark/40 bg-white/80 px-3 py-1 rounded-full">food photo</span>
                 </div>
               )}
@@ -417,7 +419,7 @@ export default function CookingSession() {
                 {selfie ? (
                   <img src={selfie instanceof File ? URL.createObjectURL(selfie) : ''} alt="Selfie" className="w-full h-full object-cover" />
                 ) : (
-                  <div className="text-3xl">😊</div>
+                  <div className="text-sm font-bold">Selfie</div>
                 )}
               </div>
             </div>
@@ -447,7 +449,7 @@ export default function CookingSession() {
                   {messages[score as keyof typeof messages] || messages[7]}
                 </p>
                 <p className="text-[10px] font-bold text-dark/60 tracking-wider uppercase">
-                  — Mumma 💖
+                  — Mumma
                 </p>
               </div>
             </div>
@@ -466,7 +468,7 @@ export default function CookingSession() {
               onClick={resetApp} 
               className="flex-1 bg-[#241000] hover:bg-[#1A0A00] text-white rounded-[30px] p-2.5 transition-all flex flex-col items-center justify-center border-[2.5px] border-transparent cursor-pointer"
             >
-              <div className="font-lilita text-[#F5B827] text-[15px] tracking-wide">mumma's kitchen ✨</div>
+              <div className="font-lilita text-[#F5B827] text-[15px] tracking-wide">mumma's kitchen</div>
               <div className="text-[9px] text-[#FAF4EB] font-bold tracking-widest opacity-80 mt-0.5">cook with love, share with world</div>
             </button>
           </div>
@@ -501,7 +503,12 @@ export default function CookingSession() {
       <div className="flex items-center justify-between mb-3">
         <div>
           <div className="text-xs font-extrabold text-dark/45 tracking-wider uppercase">now cooking</div>
-          <h3 className="font-lilita text-xl text-dark">{session.recipeName}</h3>
+          <h3 className="font-lilita text-xl text-dark flex items-center gap-2 flex-wrap">
+            {session.recipeName}
+            <span className="bg-yellow border-[1.5px] border-dark rounded-[12px] px-2.5 py-0.5 text-[10px] font-extrabold text-dark shadow-custom-small">
+              Serves: {session.servings || 2}
+            </span>
+          </h3>
         </div>
         <div className="flex flex-col items-end gap-1">
           <span className="bg-yellow border-2 border-dark rounded-[20px] px-3 py-1 text-xs font-extrabold text-dark">
@@ -539,7 +546,7 @@ export default function CookingSession() {
             >
               {isCompleted ? (
                 <>
-                  <div className="font-lilita text-lg text-yellow">✓</div>
+                  <div className="font-lilita text-lg text-yellow">Done</div>
                   <div className="text-xs font-bold text-white/35">done</div>
                 </>
               ) : (
@@ -567,16 +574,28 @@ export default function CookingSession() {
         </p>
       </Card>
 
-      <div className="flex gap-2.5 mb-3">
+      {/* Timer */}
+      <div className="mb-3">
+        <Timer />
+      </div>
+
+      <div className="flex gap-2 mb-3 flex-wrap">
         <Button
           variant="secondary"
           className="flex-1"
-          onClick={() => setChatOpen(!chatOpen)}
+          onClick={() => { setChatOpen(!chatOpen); if (!chatOpen) setVoiceCallOpen(false); }}
         >
-          {chatOpen ? '✕ close chat' : '💬 Ask Mumma'}
+          {chatOpen ? 'close chat' : 'Ask Mumma'}
         </Button>
-        <Button onClick={markStepDone} isLoading={isMarkingDone}>
-          {currentStep >= session.steps.length - 1 ? <>All done! 🥳</> : 'Done! Next →'}
+        <Button
+          variant="secondary"
+          className="flex-1"
+          onClick={() => { setVoiceCallOpen(true); setChatOpen(false); }}
+        >
+          Call Mumma
+        </Button>
+        <Button onClick={markStepDone} isLoading={isMarkingDone} className="flex-1">
+          {currentStep >= session.steps.length - 1 ? <>All done!</> : 'Done! Next'}
         </Button>
       </div>
 
@@ -597,7 +616,7 @@ export default function CookingSession() {
           >
             {!messages.length && (
               <div className="bg-yellow border-2 border-dark rounded-[16px] rounded-tl-[4px] p-3.5 max-w-[88%] text-sm font-bold leading-relaxed self-start">
-                Beta, any doubt about "{currentStepData.title}"? Ask mumma anything! ❤️
+                Beta, any doubt about "{currentStepData.title}"? Ask mumma anything!
               </div>
             )}
             {messages.map((message, index) => (
@@ -638,6 +657,20 @@ export default function CookingSession() {
             </Button>
           </div>
         </Card>
+      )}
+
+      {/* Voice Call Overlay */}
+      {voiceCallOpen && (
+        <VoiceCall
+          stepId={currentStepData.id}
+          stepTitle={currentStepData.title}
+          onClose={() => setVoiceCallOpen(false)}
+          initialQuotaExceeded={
+            userData
+              ? (userData.ttsCharactersUsed ?? 0) >= (userData.ttsCharacterLimit ?? 10000)
+              : false
+          }
+        />
       )}
 
       {/* Modal for All Steps */}
