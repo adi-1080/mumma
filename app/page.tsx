@@ -88,7 +88,7 @@ const policies = {
         <p className="font-bold text-dark">Effective Date: May 28, 2026</p>
         
         <h4 className="font-lilita text-sm text-dark mt-3">1. The Customer Guarantee</h4>
-        <p>We want you to love cooking with us! If you subscribe to our Pro tier and find that our interactive assistance is not helpful, we offer a <strong>14-day 100% money-back guarantee</strong>. Simply email refunds@mummasonlykitchen.com with your invoice number.</p>
+        <p>We want you to love cooking with us! If you subscribe to our Pro tier and find that our interactive assistance is not helpful, we offer a <strong>14-day 100% money-back guarantee</strong>. Simply email mummaskitchen5500@gmail.com with your invoice number.</p>
 
         <h4 className="font-lilita text-sm text-dark mt-3">2. Cancellation of Subscriptions</h4>
         <p>You can cancel your subscription at any time directly through your Billing Dashboard. Upon cancellation, your Pro features (such as enhanced voice limits) will remain fully active until your current billing period ends.</p>
@@ -148,7 +148,7 @@ export default function LandingPage() {
   const [feedbackRating, setFeedbackRating] = useState(5);
   const [feedbackCategory, setFeedbackCategory] = useState('suggestion');
   const [feedbackLoading, setFeedbackLoading] = useState(false);
-  const [feedbackStatus, setFeedbackStatus] = useState<'success' | 'error' | null>(null);
+  const [feedbackStatus, setFeedbackStatus] = useState<'success' | 'error' | 'prompt-login' | null>(null);
 
   useEffect(() => {
     async function fetchCommunityPosts() {
@@ -176,6 +176,11 @@ export default function LandingPage() {
   const handleFeedbackSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!feedbackMessage.trim()) return;
+
+    if (!isLoggedIn) {
+      setFeedbackStatus('prompt-login');
+      return;
+    }
 
     setFeedbackLoading(true);
     setFeedbackStatus(null);
@@ -345,90 +350,87 @@ export default function LandingPage() {
           Tell us about bugs, suggest features, or just tell us how much you loved cooking today! Your feedback helps us build the best assistant.
         </p>
 
-        {isLoggedIn ? (
-          <form onSubmit={handleFeedbackSubmit} className="space-y-4">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {/* Category */}
-              <div>
-                <label className="block text-[10px] font-extrabold uppercase text-dark/60 mb-1.5">Category</label>
-                <select 
-                  value={feedbackCategory}
-                  onChange={(e) => setFeedbackCategory(e.target.value)}
-                  className="w-full bg-white border-2 border-dark rounded-[12px] px-3.5 py-2.5 text-xs font-bold focus:outline-none focus:ring-2 focus:ring-blue"
-                >
-                  <option value="suggestion">💡 Suggestion / Idea</option>
-                  <option value="bug">🐛 Report a Bug</option>
-                  <option value="compliment">💖 Compliment / Love</option>
-                  <option value="other">❓ Other</option>
-                </select>
-              </div>
-
-              {/* Rating */}
-              <div>
-                <label className="block text-[10px] font-extrabold uppercase text-dark/60 mb-1.5">How would you rate us?</label>
-                <div className="flex gap-2">
-                  {[1, 2, 3, 4, 5].map((star) => (
-                    <button
-                      key={star}
-                      type="button"
-                      onClick={() => setFeedbackRating(star)}
-                      className={`w-8 h-8 rounded-full border-2 border-dark flex items-center justify-center font-lilita text-xs transition-all active:scale-90 ${
-                        feedbackRating === star 
-                          ? 'bg-yellow text-dark shadow-custom-small translate-y-[-2px]' 
-                          : 'bg-white text-dark/40'
-                      }`}
-                    >
-                      {star}⭐
-                    </button>
-                  ))}
-                </div>
-              </div>
-            </div>
-
-            {/* Message */}
+        <form onSubmit={handleFeedbackSubmit} className="space-y-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {/* Category */}
             <div>
-              <label className="block text-[10px] font-extrabold uppercase text-dark/60 mb-1.5">Your Message</label>
-              <textarea
-                value={feedbackMessage}
-                onChange={(e) => setFeedbackMessage(e.target.value)}
-                placeholder="What can we do better beta? Share your thoughts..."
-                rows={3}
-                required
-                className="w-full bg-white border-2 border-dark rounded-[14px] p-3 text-xs font-bold focus:outline-none focus:ring-2 focus:ring-blue placeholder-dark/30 leading-relaxed"
-              />
+              <label className="block text-[10px] font-extrabold uppercase text-dark/60 mb-1.5">Category</label>
+              <select 
+                value={feedbackCategory}
+                onChange={(e) => setFeedbackCategory(e.target.value)}
+                className="w-full bg-white border-2 border-dark rounded-[12px] px-3.5 py-2.5 text-xs font-bold focus:outline-none focus:ring-2 focus:ring-blue"
+              >
+                <option value="suggestion">💡 Suggestion / Idea</option>
+                <option value="bug">🐛 Report a Bug</option>
+                <option value="compliment">💖 Compliment / Love</option>
+                <option value="other">❓ Other</option>
+              </select>
             </div>
 
-            {feedbackStatus === 'success' && (
-              <div className="p-3 bg-green/20 border-2 border-dark rounded-[12px] text-xs font-bold text-dark">
-                Acha! Thank you beta! Mumma has received your valuable feedback. 💖
+            {/* Rating */}
+            <div>
+              <label className="block text-[10px] font-extrabold uppercase text-dark/60 mb-1.5">How would you rate us?</label>
+              <div className="flex gap-2">
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <button
+                    key={star}
+                    type="button"
+                    onClick={() => setFeedbackRating(star)}
+                    className={`w-8 h-8 rounded-full border-2 border-dark flex items-center justify-center font-lilita text-xs transition-all active:scale-90 ${
+                      feedbackRating === star 
+                        ? 'bg-yellow text-dark shadow-custom-small translate-y-[-2px]' 
+                        : 'bg-white text-dark/40'
+                    }`}
+                  >
+                    {star}⭐
+                  </button>
+                ))}
               </div>
-            )}
-
-            {feedbackStatus === 'error' && (
-              <div className="p-3 bg-pink/20 border-2 border-dark rounded-[12px] text-xs font-bold text-dark">
-                Oh no! Failed to submit. Please try again.
-              </div>
-            )}
-
-            <Button
-              type="submit"
-              disabled={feedbackLoading}
-              className="!py-2.5 !px-6 !text-xs !shadow-custom-small"
-            >
-              {feedbackLoading ? 'Sending...' : 'Submit Feedback →'}
-            </Button>
-          </form>
-        ) : (
-          <div className="bg-white border-2 border-dark border-dashed rounded-[16px] p-5 text-center flex flex-col items-center justify-center gap-3">
-            <span className="text-2xl">🔒</span>
-            <p className="text-xs font-extrabold text-dark/60">
-              Only signed-in betas can share feedback. Please login first to help us grow!
-            </p>
-            <Link href="/login" className="btn-primary !py-2 !px-5 !text-xs !shadow-custom-small inline-block">
-              Log In to Share Feedback
-            </Link>
+            </div>
           </div>
-        )}
+
+          {/* Message */}
+          <div>
+            <label className="block text-[10px] font-extrabold uppercase text-dark/60 mb-1.5">Your Message</label>
+            <textarea
+              value={feedbackMessage}
+              onChange={(e) => setFeedbackMessage(e.target.value)}
+              placeholder="What can we do better beta? Share your thoughts..."
+              rows={3}
+              required
+              className="w-full bg-white border-2 border-dark rounded-[14px] p-3 text-xs font-bold focus:outline-none focus:ring-2 focus:ring-blue placeholder-dark/30 leading-relaxed"
+            />
+          </div>
+
+          {feedbackStatus === 'success' && (
+            <div className="p-3 bg-green/20 border-2 border-dark rounded-[12px] text-xs font-bold text-dark">
+              Acha! Thank you beta! Mumma has received your valuable feedback. 💖
+            </div>
+          )}
+
+          {feedbackStatus === 'error' && (
+            <div className="p-3 bg-pink/20 border-2 border-dark rounded-[12px] text-xs font-bold text-dark">
+              Oh no! Failed to submit. Please try again.
+            </div>
+          )}
+
+          {feedbackStatus === 'prompt-login' && (
+            <div className="p-3.5 bg-yellow/20 border-[2.5px] border-dark rounded-[16px] text-xs font-extrabold text-dark flex flex-col sm:flex-row items-center justify-between gap-3 shadow-custom-small">
+              <span>Beta, at least use the app first and then provide feedback! Go log in and try cooking first! 😉</span>
+              <Link href="/login" className="btn-primary !py-1.5 !px-4 !text-[10px] !shadow-custom-small whitespace-nowrap">
+                Log In Now →
+              </Link>
+            </div>
+          )}
+
+          <Button
+            type="submit"
+            disabled={feedbackLoading}
+            className="!py-2.5 !px-6 !text-xs !shadow-custom-small"
+          >
+            {feedbackLoading ? 'Sending...' : 'Submit Feedback →'}
+          </Button>
+        </form>
       </Card>
 
       {/* SaaS Premium Footer */}
@@ -484,7 +486,7 @@ export default function LandingPage() {
                   </button>
                 </li>
                 <li>
-                  <a href="mailto:support@mummasonlykitchen.com" className="text-dark/70 hover:text-pink transition-colors block">
+                  <a href="mailto:mummaskitchen5500@gmail.com" className="text-dark/70 hover:text-pink transition-colors block">
                     Customer Support
                   </a>
                 </li>

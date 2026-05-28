@@ -187,9 +187,13 @@ export default function DashboardPage() {
                       </div>
                       <button
                         onClick={() => handleToggleVisibility(session.id, session.isPublished)}
-                        className="bg-yellow border-2 border-dark rounded-[6px] px-2 py-1 text-xs font-bold text-dark hover:bg-yellow/90 transition-colors"
+                        className={`border-2 border-dark rounded-[6px] px-2 py-1 text-xs font-bold transition-all active:scale-95 cursor-pointer ${
+                          session.isPublished 
+                            ? 'bg-pink text-white hover:bg-[#D94A84]' 
+                            : 'bg-yellow text-dark hover:bg-yellow/90'
+                        }`}
                       >
-                        {session.isPublished ? '🔒 Make Private' : '🌍 Make Public'}
+                        {session.isPublished ? 'Make Private' : 'Make Public'}
                       </button>
                     </div>
                   )}

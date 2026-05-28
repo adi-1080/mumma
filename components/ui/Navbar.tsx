@@ -13,6 +13,7 @@ export default function Navbar() {
 
   const getActiveClass = (path: string) => {
     if (path === '/' && pathname === '/') return 'active';
+    if (path === '/dashboard' && pathname === '/dashboard') return 'active';
     if (path === '/cook' && pathname.startsWith('/cook')) return 'active';
     if (path === '/community' && pathname === '/community') return 'active';
     if (path === '/recipes' && pathname.startsWith('/recipes')) return 'active';
@@ -33,6 +34,9 @@ export default function Navbar() {
         <div className="flex gap-1 bg-white/10 rounded-[20px] p-1 mobile-hidden ml-4">
           <Link href="/" className={`np block text-center ${getActiveClass('/')}`}>
             Home
+          </Link>
+          <Link href="/dashboard" className={`np block text-center ${getActiveClass('/dashboard')}`}>
+            Dashboard
           </Link>
           <Link href="/cook" className={`np block text-center ${getActiveClass('/cook')}`}>
             Cook
