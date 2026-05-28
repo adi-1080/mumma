@@ -10,6 +10,22 @@ export default function Navbar() {
   const pathname = usePathname();
 
   const { data: session } = authClient.useSession();
+  const [isProUser, setIsProUser] = React.useState(false);
+
+  React.useEffect(() => {
+    if (!session?.user?.id) {
+      setIsProUser(false);
+      return;
+    }
+    fetch('/api/user/profile')
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.user?.plan === 'PRO') {
+          setIsProUser(true);
+        }
+      })
+      .catch(() => {});
+  }, [session]);
 
   const getActiveClass = (path: string) => {
     if (path === '/' && pathname === '/') return 'active';
@@ -56,7 +72,12 @@ export default function Navbar() {
       </div>
       
       {session ? (
-        <div className="flex items-center gap-3.5 ml-auto">
+        <div className="flex items-center gap-2.5 ml-auto">
+          {!isProUser && (
+            <Link href="/pricing" className="mobile-only bg-pink hover:bg-pink/90 text-white font-nunito font-extrabold text-[10px] uppercase px-2.5 py-1.5 rounded-[8px] border-[2px] border-dark shadow-custom-small transition-all active:scale-95 whitespace-nowrap flex items-center justify-center">
+              Go Pro
+            </Link>
+          )}
           <Link href="/profile" className="flex items-center hover:opacity-80 transition-opacity">
             <div className="w-8 h-8 rounded-full overflow-hidden border-2 border-dark flex-shrink-0 shadow-custom-small bg-white">
               {session.user?.image ? (
@@ -84,10 +105,15 @@ export default function Navbar() {
           </button>
         </div>
       ) : (
-        <Link href="/login" className="ml-auto bg-yellow hover:bg-yellow/90 text-dark font-nunito font-bold text-sm px-4 py-2 rounded-[10px] shadow-custom-small transition-colors whitespace-nowrap inline-flex items-center justify-center">
-          <span className="desktop-only text-dark">Sign In</span>
-          <span className="mobile-only text-dark">Login</span>
-        </Link>
+        <div className="flex items-center gap-2.5 ml-auto">
+          <Link href="/pricing" className="mobile-only bg-pink hover:bg-pink/90 text-white font-nunito font-extrabold text-[10px] uppercase px-2.5 py-1.5 rounded-[8px] border-[2px] border-dark shadow-custom-small transition-all active:scale-95 whitespace-nowrap flex items-center justify-center">
+            Go Pro
+          </Link>
+          <Link href="/login" className="bg-yellow hover:bg-yellow/90 text-dark font-nunito font-bold text-sm px-4 py-2 rounded-[10px] shadow-custom-small transition-colors whitespace-nowrap inline-flex items-center justify-center">
+            <span className="desktop-only text-dark">Sign In</span>
+            <span className="mobile-only text-dark">Login</span>
+          </Link>
+        </div>
       )}
     </nav>
   );
