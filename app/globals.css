@@ -65,6 +65,11 @@
       opacity: 1;
     }
   }
+
+  @keyframes marquee {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
 }
 
 /* Custom utility classes */
@@ -92,7 +97,18 @@
   .dot-3 {
     animation: dot 1.4s ease infinite 0.4s;
   }
+
+  .animate-marquee {
+    display: flex;
+    width: max-content;
+    animation: marquee 25s linear infinite;
+  }
+
+  .animate-marquee-hover-pause:hover {
+    animation-play-state: paused;
+  }
 }
+
 
 /* Base styles */
 body {
