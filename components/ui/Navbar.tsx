@@ -35,11 +35,9 @@ export default function Navbar() {
           <Link href="/" className={`np block text-center ${getActiveClass('/')}`}>
             Home
           </Link>
-          {session && (
-            <Link href="/dashboard" className={`np block text-center ${getActiveClass('/dashboard')}`}>
-              Dashboard
-            </Link>
-          )}
+          <Link href="/dashboard" className={`np block text-center ${getActiveClass('/dashboard')}`}>
+            Dashboard
+          </Link>
           <Link href="/cook" className={`np block text-center ${getActiveClass('/cook')}`}>
             Cook
           </Link>
