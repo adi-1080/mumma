@@ -1,0 +1,18 @@
+-- CreateTable
+CREATE TABLE "feedback" (
+    "id" TEXT NOT NULL,
+    "userId" TEXT NOT NULL,
+    "message" TEXT NOT NULL,
+    "rating" INTEGER,
+    "category" TEXT,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "feedback_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateIndex
+CREATE INDEX "feedback_userId_idx" ON "feedback"("userId");
+
+-- AddForeignKey
+ALTER TABLE "feedback" ADD CONSTRAINT "feedback_userId_fkey" FOREIGN KEY ("userId") REFERENCES "user"("id") ON DELETE CASCADE ON UPDATE CASCADE;

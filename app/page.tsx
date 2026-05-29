@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { authClient } from '@/lib/auth-client';
 import Button from '@/components/ui/Button';
 import Card from '@/components/ui/Card';
 import MomAnimation from '@/components/ui/MomAnimation';
@@ -30,7 +31,7 @@ const fallbackPosts = [
   {
     id: "mock-4",
     sessionId: "mock-session-4",
-    user: { name: " Sneha K." },
+    user: { name: "Sneha K." },
     result: { recipeName: "Paneer Bhurji", score: 9, foodPhotoUrl: "" }
   }
 ];
@@ -138,6 +139,17 @@ export default function LandingPage() {
   const [activePolicy, setActivePolicy] = useState<keyof typeof policies | null>(null);
   const [communityPosts, setCommunityPosts] = useState<any[]>([]);
 
+  // Authentication Status check via Better Auth
+  const { data: session } = authClient.useSession();
+  const isLoggedIn = !!session;
+
+  // Feedback states
+  const [feedbackMessage, setFeedbackMessage] = useState('');
+  const [feedbackRating, setFeedbackRating] = useState(5);
+  const [feedbackCategory, setFeedbackCategory] = useState('suggestion');
+  const [feedbackLoading, setFeedbackLoading] = useState(false);
+  const [feedbackStatus, setFeedbackStatus] = useState<'success' | 'error' | null>(null);
+
   useEffect(() => {
     async function fetchCommunityPosts() {
       try {
@@ -159,6 +171,43 @@ export default function LandingPage() {
   
   // Duplicate the array to ensure a continuous, gap-less infinite scrolling marquee
   const marqueePosts = [...activePosts, ...activePosts, ...activePosts, ...activePosts];
+
+  // Feedback Submission handler
+  const handleFeedbackSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!feedbackMessage.trim()) return;
+
+    setFeedbackLoading(true);
+    setFeedbackStatus(null);
+
+    try {
+      const res = await fetch('/api/feedback', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          message: feedbackMessage,
+          rating: feedbackRating,
+          category: feedbackCategory,
+        }),
+      });
+
+      if (res.ok) {
+        setFeedbackStatus('success');
+        setFeedbackMessage('');
+        setFeedbackRating(5);
+        setFeedbackCategory('suggestion');
+      } else {
+        setFeedbackStatus('error');
+      }
+    } catch (err) {
+      console.error('Error submitting feedback:', err);
+      setFeedbackStatus('error');
+    } finally {
+      setFeedbackLoading(false);
+    }
+  };
 
   return (
     <div className="main-container fade-up container-mobile">
@@ -284,6 +333,103 @@ export default function LandingPage() {
           </div>
         </div>
       </div>
+
+      {/* Interactive Feedback Form Section */}
+      <Card className="bg-[#EBF5FF] border-[2.5px] border-dark rounded-[24px] p-6 mb-8 card-mobile shadow-custom text-left relative overflow-hidden">
+        <div className="absolute -right-8 -top-8 w-24 h-24 rounded-full bg-blue/15 flex items-center justify-center">
+          <span className="text-3xl rotate-12">💬</span>
+        </div>
+        
+        <h3 className="font-lilita text-2xl text-dark mb-1">Help Mumma Improve!</h3>
+        <p className="text-xs font-bold text-dark/60 mb-5 max-w-md">
+          Tell us about bugs, suggest features, or just tell us how much you loved cooking today! Your feedback helps us build the best assistant.
+        </p>
+
+        {isLoggedIn ? (
+          <form onSubmit={handleFeedbackSubmit} className="space-y-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {/* Category */}
+              <div>
+                <label className="block text-[10px] font-extrabold uppercase text-dark/60 mb-1.5">Category</label>
+                <select 
+                  value={feedbackCategory}
+                  onChange={(e) => setFeedbackCategory(e.target.value)}
+                  className="w-full bg-white border-2 border-dark rounded-[12px] px-3.5 py-2.5 text-xs font-bold focus:outline-none focus:ring-2 focus:ring-blue"
+                >
+                  <option value="suggestion">💡 Suggestion / Idea</option>
+                  <option value="bug">🐛 Report a Bug</option>
+                  <option value="compliment">💖 Compliment / Love</option>
+                  <option value="other">❓ Other</option>
+                </select>
+              </div>
+
+              {/* Rating */}
+              <div>
+                <label className="block text-[10px] font-extrabold uppercase text-dark/60 mb-1.5">How would you rate us?</label>
+                <div className="flex gap-2">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <button
+                      key={star}
+                      type="button"
+                      onClick={() => setFeedbackRating(star)}
+                      className={`w-8 h-8 rounded-full border-2 border-dark flex items-center justify-center font-lilita text-xs transition-all active:scale-90 ${
+                        feedbackRating === star 
+                          ? 'bg-yellow text-dark shadow-custom-small translate-y-[-2px]' 
+                          : 'bg-white text-dark/40'
+                      }`}
+                    >
+                      {star}⭐
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* Message */}
+            <div>
+              <label className="block text-[10px] font-extrabold uppercase text-dark/60 mb-1.5">Your Message</label>
+              <textarea
+                value={feedbackMessage}
+                onChange={(e) => setFeedbackMessage(e.target.value)}
+                placeholder="What can we do better beta? Share your thoughts..."
+                rows={3}
+                required
+                className="w-full bg-white border-2 border-dark rounded-[14px] p-3 text-xs font-bold focus:outline-none focus:ring-2 focus:ring-blue placeholder-dark/30 leading-relaxed"
+              />
+            </div>
+
+            {feedbackStatus === 'success' && (
+              <div className="p-3 bg-green/20 border-2 border-dark rounded-[12px] text-xs font-bold text-dark">
+                Acha! Thank you beta! Mumma has received your valuable feedback. 💖
+              </div>
+            )}
+
+            {feedbackStatus === 'error' && (
+              <div className="p-3 bg-pink/20 border-2 border-dark rounded-[12px] text-xs font-bold text-dark">
+                Oh no! Failed to submit. Please try again.
+              </div>
+            )}
+
+            <Button
+              type="submit"
+              disabled={feedbackLoading}
+              className="!py-2.5 !px-6 !text-xs !shadow-custom-small"
+            >
+              {feedbackLoading ? 'Sending...' : 'Submit Feedback →'}
+            </Button>
+          </form>
+        ) : (
+          <div className="bg-white border-2 border-dark border-dashed rounded-[16px] p-5 text-center flex flex-col items-center justify-center gap-3">
+            <span className="text-2xl">🔒</span>
+            <p className="text-xs font-extrabold text-dark/60">
+              Only signed-in betas can share feedback. Please login first to help us grow!
+            </p>
+            <Link href="/login" className="btn-primary !py-2 !px-5 !text-xs !shadow-custom-small inline-block">
+              Log In to Share Feedback
+            </Link>
+          </div>
+        )}
+      </Card>
 
       {/* SaaS Premium Footer */}
       <footer className="mt-16 border-t-[2.5px] border-dark pt-10 pb-8">
