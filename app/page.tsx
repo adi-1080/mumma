@@ -142,6 +142,22 @@ export default function LandingPage() {
   // Authentication Status check via Better Auth
   const { data: session } = authClient.useSession();
   const isLoggedIn = !!session;
+  const [isProUser, setIsProUser] = useState(false);
+
+  useEffect(() => {
+    if (!session?.user?.id) {
+      setIsProUser(false);
+      return;
+    }
+    fetch('/api/user/profile')
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.user?.plan === 'PRO') {
+          setIsProUser(true);
+        }
+      })
+      .catch(() => {});
+  }, [session]);
 
   // Feedback states
   const [feedbackMessage, setFeedbackMessage] = useState('');
@@ -277,7 +293,7 @@ export default function LandingPage() {
       </div>
 
       {/* Score & Share */}
-      <Card className="bg-orange flex items-center gap-4 mb-4 card-mobile">
+      <Card className="bg-orange flex items-center gap-4 mb-3 card-mobile">
         <div className="text-4xl"><span className="emoji-trophy emoji-mobile"></span></div>
         <div>
           <h3 className="font-lilita text-xl text-dark mb-1">Score & Share</h3>
@@ -286,6 +302,23 @@ export default function LandingPage() {
           </p>
         </div>
       </Card>
+
+      {!isProUser && (
+        /* Go Pro Promo Card */
+        <Card className="bg-pink text-white flex flex-col sm:flex-row items-center justify-between gap-4 mb-4 card-mobile relative overflow-hidden shadow-custom border-[2.5px] border-dark">
+          <div className="flex items-center gap-4 flex-1">
+            <div>
+              <h3 className="font-lilita text-xl text-white mb-0.5">Unlock Unlimited Cooking</h3>
+              <p className="text-xs font-bold text-white/80 leading-relaxed">
+                Upgrade to Pro for unlimited AI voice chat limits, faster recipe generation, and premium motherly cooking tips!
+              </p>
+            </div>
+          </div>
+          <Link href="/pricing" className="bg-yellow hover:bg-yellow/90 text-dark font-nunito font-extrabold text-xs px-5 py-2.5 rounded-[12px] shadow-custom-small border-2 border-dark whitespace-nowrap transition-all active:scale-95 cursor-pointer block text-center w-full sm:w-auto">
+            Upgrade to Pro →
+          </Link>
+        </Card>
+      )}
 
       {/* Real Data Community Preview with Auto Scroll Marquee */}
       <div className="mb-8 overflow-hidden w-full relative">
@@ -341,9 +374,6 @@ export default function LandingPage() {
 
       {/* Interactive Feedback Form Section */}
       <Card className="bg-[#EBF5FF] border-[2.5px] border-dark rounded-[24px] p-6 mb-8 card-mobile shadow-custom text-left relative overflow-hidden">
-        <div className="absolute -right-8 -top-8 w-24 h-24 rounded-full bg-blue/15 flex items-center justify-center">
-          <span className="text-3xl rotate-12">💬</span>
-        </div>
         
         <h3 className="font-lilita text-2xl text-dark mb-1">Help Mumma Improve!</h3>
         <p className="text-xs font-bold text-dark/60 mb-5 max-w-md">
@@ -360,10 +390,10 @@ export default function LandingPage() {
                 onChange={(e) => setFeedbackCategory(e.target.value)}
                 className="w-full bg-white border-2 border-dark rounded-[12px] px-3.5 py-2.5 text-xs font-bold focus:outline-none focus:ring-2 focus:ring-blue"
               >
-                <option value="suggestion">💡 Suggestion / Idea</option>
-                <option value="bug">🐛 Report a Bug</option>
-                <option value="compliment">💖 Compliment / Love</option>
-                <option value="other">❓ Other</option>
+                <option value="suggestion">Suggestion / Idea</option>
+                <option value="bug">Report a Bug</option>
+                <option value="compliment">Compliment / Love</option>
+                <option value="other">Other</option>
               </select>
             </div>
 
@@ -382,7 +412,7 @@ export default function LandingPage() {
                         : 'bg-white text-dark/40'
                     }`}
                   >
-                    {star}⭐
+                    {star} ★
                   </button>
                 ))}
               </div>
@@ -404,7 +434,7 @@ export default function LandingPage() {
 
           {feedbackStatus === 'success' && (
             <div className="p-3 bg-green/20 border-2 border-dark rounded-[12px] text-xs font-bold text-dark">
-              Acha! Thank you beta! Mumma has received your valuable feedback. 💖
+              Acha! Thank you beta! Mumma has received your valuable feedback.
             </div>
           )}
 
@@ -416,7 +446,7 @@ export default function LandingPage() {
 
           {feedbackStatus === 'prompt-login' && (
             <div className="p-3.5 bg-yellow/20 border-[2.5px] border-dark rounded-[16px] text-xs font-extrabold text-dark flex flex-col sm:flex-row items-center justify-between gap-3 shadow-custom-small">
-              <span>Beta, at least use the app first and then provide feedback! Go log in and try cooking first! 😉</span>
+              <span>Beta, at least use the app first and then provide feedback! Go log in and try cooking first!</span>
               <Link href="/login" className="btn-primary !py-1.5 !px-4 !text-[10px] !shadow-custom-small whitespace-nowrap">
                 Log In Now →
               </Link>
