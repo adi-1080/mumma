@@ -88,7 +88,7 @@ const policies = {
         <p className="font-bold text-dark">Effective Date: May 28, 2026</p>
         
         <h4 className="font-lilita text-sm text-dark mt-3">1. The Customer Guarantee</h4>
-        <p>We want you to love cooking with us! If you subscribe to our Pro tier and find that our interactive assistance is not helpful, we offer a <strong>14-day 100% money-back guarantee</strong>. Simply email refunds@mummasonlykitchen.com with your invoice number.</p>
+        <p>We want you to love cooking with us! If you subscribe to our Pro tier and find that our interactive assistance is not helpful, we offer a <strong>14-day 100% money-back guarantee</strong>. Simply email mummaskitchen5500@gmail.com with your invoice number.</p>
 
         <h4 className="font-lilita text-sm text-dark mt-3">2. Cancellation of Subscriptions</h4>
         <p>You can cancel your subscription at any time directly through your Billing Dashboard. Upon cancellation, your Pro features (such as enhanced voice limits) will remain fully active until your current billing period ends.</p>
@@ -484,7 +484,7 @@ export default function LandingPage() {
                   </button>
                 </li>
                 <li>
-                  <a href="mailto:support@mummasonlykitchen.com" className="text-dark/70 hover:text-pink transition-colors block">
+                  <a href="mailto:mummaskitchen5500@gmail.com" className="text-dark/70 hover:text-pink transition-colors block">
                     Customer Support
                   </a>
                 </li>
