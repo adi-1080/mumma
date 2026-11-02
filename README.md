@@ -16,6 +16,10 @@ bun dev
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
+## OpenRouter model configuration
+
+Copy the model settings from `.env.example` into `.env` to choose models independently for recipe generation, step chat, and voice chat. The values shown are the defaults; each setting can be changed to any model ID supported by OpenRouter. These variables are server-side only.
+
 You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.

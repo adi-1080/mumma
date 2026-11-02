@@ -1,6 +1,6 @@
 import { NextRequest } from "next/server"
 import { prisma } from "@/lib/prisma"
-import { openrouter } from "@/lib/openrouter"
+import { openrouter, openRouterModels } from "@/lib/openrouter"
 import { getOptionalSession } from "@/lib/auth-session"
 import { ok, err } from "@/lib/api-response"
 import { StartSessionSchema } from "@/lib/validators/session"
@@ -33,7 +33,7 @@ Return this exact JSON:
 }${retry ? "\n\nReturn ONLY raw JSON, no text before or after." : ""}`
 
   const res = await openrouter.chat.completions.create({
-    model: "openai/gpt-oss-120b:free",
+    model: openRouterModels.recipe,
     max_tokens: 1000,
     messages: [
       { role: "system", content: SYSTEM_PROMPT },

@@ -1,6 +1,6 @@
 import { NextRequest } from "next/server"
 import { prisma } from "@/lib/prisma"
-import { openrouter } from "@/lib/openrouter"
+import { openrouter, openRouterModels } from "@/lib/openrouter"
 import { getOptionalSession } from "@/lib/auth-session"
 import { ok, err } from "@/lib/api-response"
 import { StepChatSchema } from "@/lib/validators/session"
@@ -65,7 +65,7 @@ Never break character. You are always their mom, always in the kitchen with them
     ]
 
     const res = await openrouter.chat.completions.create({
-      model: "openai/gpt-oss-120b",
+      model: openRouterModels.stepChat,
       max_tokens: 300,
       messages,
     })

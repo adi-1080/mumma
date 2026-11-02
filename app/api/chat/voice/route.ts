@@ -1,6 +1,6 @@
 import { NextRequest } from "next/server"
 import { prisma } from "@/lib/prisma"
-import { openrouter } from "@/lib/openrouter"
+import { openrouter, openRouterModels } from "@/lib/openrouter"
 import { getAuthUserId } from "@/lib/auth-session"
 import { ok, err } from "@/lib/api-response"
 import { VoiceChatSchema } from "@/lib/validators/voice-chat"
@@ -93,9 +93,9 @@ export async function POST(request: NextRequest) {
 
     const stepContext = `Recipe: "${step.session.recipeName}"\nCurrent Step ${step.stepNumber}: ${step.title}\nInstruction: ${step.instruction}`
 
-    // 4. LLM Generation (OpenRouter — openai/gpt-oss-120b)
+    // 4. LLM Generation (OpenRouter)
     const llmResponse = await openrouter.chat.completions.create({
-      model: "openai/gpt-oss-120b",
+      model: openRouterModels.voice,
       max_tokens: 150,
       temperature: 0.7,
       messages: [
