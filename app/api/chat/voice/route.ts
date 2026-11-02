@@ -93,9 +93,9 @@ export async function POST(request: NextRequest) {
 
     const stepContext = `Recipe: "${step.session.recipeName}"\nCurrent Step ${step.stepNumber}: ${step.title}\nInstruction: ${step.instruction}`
 
-    // 4. LLM Generation (OpenRouter — Llama 3.1)
+    // 4. LLM Generation (OpenRouter — openai/gpt-oss-120b)
     const llmResponse = await openrouter.chat.completions.create({
-      model: "meta-llama/llama-3.1-8b-instruct",
+      model: "openai/gpt-oss-120b",
       max_tokens: 150,
       temperature: 0.7,
       messages: [

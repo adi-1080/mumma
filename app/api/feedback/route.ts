@@ -22,7 +22,7 @@ export async function POST(request: NextRequest) {
       data: {
         userId,
         message: message.trim(),
-        rating: rating ? parseInt(rating, 10) : null,
+        rating: rating !== undefined && rating !== null ? Number(rating) : null,
         category: category || null,
       }
     })

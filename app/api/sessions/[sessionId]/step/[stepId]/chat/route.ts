@@ -65,7 +65,7 @@ Never break character. You are always their mom, always in the kitchen with them
     ]
 
     const res = await openrouter.chat.completions.create({
-      model: "meta-llama/llama-3.1-8b-instruct",
+      model: "openai/gpt-oss-120b",
       max_tokens: 300,
       messages,
     })
